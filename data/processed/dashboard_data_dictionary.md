@@ -141,6 +141,31 @@ Country Explorer의 "tercile 위치" 표시에 사용.
 unit, comparability, note`. 모든 상위 CSV의 계산 원천. 대시보드에 직접 노출하지 않되, AI가 "이 수치가
 어느 표(table_id)에서 나왔는지" 답할 때 조회 대상으로 사용 가능.
 
+## 13. `tables_17_18_37_key_values_clean.csv` (17,960행, C급) — 콘텐츠 호감/비호감·부정인식 이유
+
+2026-08-26 추가. 8개 방문 장벽(%)의 "왜"를 설문이 직접 묻지 않아 생긴 공백을 메우기 위해
+표 1-17/1-18/1-37을 추가로 OCR 추출했다. `analysis_long.csv`와 마찬가지로 롱포맷 원천이며,
+대시보드 기본 화면에 노출하지 않고 AI가 "왜 그런지" 설명할 때 근거로 조회한다.
+
+| 컬럼 | 타입 | 의미 |
+|---|---|---|
+| country | string | 국가명 |
+| table_id | string | "1-17"(호감요인) / "1-18"(호감 저해요인) / "1-37"(한류 부정적 인식 공감 이유) |
+| indicator | string | 표 이름 한글 |
+| content_category | string | 콘텐츠 카테고리(드라마/예능/영화/음악/애니메이션/출판물/웹툰/게임/패션/뷰티/음식/한국어). **1-37은 이 값이 없음**(카테고리 구분 없는 단일 문항) |
+| item | string | 이유 항목 텍스트. OCR 라벨을 빈도 기반으로 정규화한 것(`clean_labels_17_18_37.py`) — `label_confidence` 참고 |
+| raw_item | string | 정규화 전 원본 OCR 텍스트(참고용, 원본 추적 목적) |
+| rank_group | string | "1순위" / "1+2순위(중복)" — 1-16/33/35/41과 달리 이 표는 순위 응답형이라 두 종류 값이 공존 |
+| value | float(%) | 해당 항목 응답 비율 |
+| base | int | (사례수) — 카테고리/문항 블록별 BASE |
+| label_confidence | string | "high_confidence"(같은 라벨이 20회 이상 반복 확인됨) / "low_confidence"(OCR 잡음으로 라벨을 신뢰하기 어려움 — **value는 유효하나 item 텍스트는 화면에 그대로 노출하지 말 것**) |
+| verification_status | string | "auto_extracted" / "manual_review" (1순위/1+2순위 병합 실패 등 — 값은 보존되나 rank_group 확정도가 낮음) |
+| source_page | string | 원본 PDF 페이지 번호(쉼표구분) |
+
+**주의**:
+- 1-17/1-18의 BASE는 "방문 비의향자"가 아니라 **해당 콘텐츠 카테고리 경험/인지자**다(barrier_pattern_analysis.csv와 BASE가 다름 — 직접 차감하거나 같은 모집단처럼 섞지 않는다).
+- `label_confidence`가 "low_confidence"인 행은 값 자체(%)는 유효하지만 어떤 항목인지 텍스트로 단정하지 말고, 인용할 때 "정확한 항목명은 불확실하나 이런 응답이 있었다" 수준으로만 서술한다.
+
 ## 공통 규칙
 
 - 모든 퍼센트 값은 소수점 표시 여부와 무관하게 **국가 단위 응답 비율**이며, 개인 단위 확률이 아니다.
