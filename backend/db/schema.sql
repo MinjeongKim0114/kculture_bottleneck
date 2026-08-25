@@ -237,6 +237,7 @@ create table if not exists content_liking_disliking_reasons (
 
 create index if not exists idx_content_reasons_country on content_liking_disliking_reasons (country);
 create index if not exists idx_content_reasons_table_id on content_liking_disliking_reasons (table_id);
+alter table content_liking_disliking_reasons enable row level security;
 
 -- =====================================================================
 -- 14. reddit_qualitative_evidence (942행, C급, private) — Reddit 정성 근거 (Track1+2)
@@ -262,3 +263,4 @@ create table if not exists reddit_qualitative_evidence (
     business_theme                   text,
     business_theme_reason            text
 );
+alter table reddit_qualitative_evidence enable row level security;
