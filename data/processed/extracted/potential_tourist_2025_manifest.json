@@ -1,0 +1,713 @@
+{
+  "total_values": 39667,
+  "pages": [
+    {
+      "page": 229,
+      "survey": "일반외국인",
+      "n_values": 305,
+      "issues": []
+    },
+    {
+      "page": 240,
+      "survey": "일반외국인",
+      "n_values": 329,
+      "issues": []
+    },
+    {
+      "page": 241,
+      "survey": "일반외국인",
+      "n_values": 329,
+      "issues": []
+    },
+    {
+      "page": 242,
+      "survey": "일반외국인",
+      "n_values": 188,
+      "issues": []
+    },
+    {
+      "page": 243,
+      "survey": "일반외국인",
+      "n_values": 329,
+      "issues": []
+    },
+    {
+      "page": 245,
+      "survey": "일반외국인",
+      "n_values": 468,
+      "issues": []
+    },
+    {
+      "page": 246,
+      "survey": "일반외국인",
+      "n_values": 467,
+      "issues": []
+    },
+    {
+      "page": 247,
+      "survey": "일반외국인",
+      "n_values": 517,
+      "issues": []
+    },
+    {
+      "page": 248,
+      "survey": "일반외국인",
+      "n_values": 328,
+      "issues": []
+    },
+    {
+      "page": 249,
+      "survey": "일반외국인",
+      "n_values": 464,
+      "issues": []
+    },
+    {
+      "page": 250,
+      "survey": "일반외국인",
+      "n_values": 435,
+      "issues": []
+    },
+    {
+      "page": 251,
+      "survey": "일반외국인",
+      "n_values": 466,
+      "issues": []
+    },
+    {
+      "page": 252,
+      "survey": "일반외국인",
+      "n_values": 451,
+      "issues": []
+    },
+    {
+      "page": 253,
+      "survey": "일반외국인",
+      "n_values": 468,
+      "issues": []
+    },
+    {
+      "page": 254,
+      "survey": "일반외국인",
+      "n_values": 441,
+      "issues": []
+    },
+    {
+      "page": 255,
+      "survey": "일반외국인",
+      "n_values": 441,
+      "issues": []
+    },
+    {
+      "page": 256,
+      "survey": "일반외국인",
+      "n_values": 104,
+      "issues": []
+    },
+    {
+      "page": 257,
+      "survey": "일반외국인",
+      "n_values": 451,
+      "issues": []
+    },
+    {
+      "page": 258,
+      "survey": "일반외국인",
+      "n_values": 420,
+      "issues": []
+    },
+    {
+      "page": 259,
+      "survey": "일반외국인",
+      "n_values": 437,
+      "issues": []
+    },
+    {
+      "page": 260,
+      "survey": "일반외국인",
+      "n_values": 88,
+      "issues": []
+    },
+    {
+      "page": 261,
+      "survey": "일반외국인",
+      "n_values": 287,
+      "issues": []
+    },
+    {
+      "page": 262,
+      "survey": "일반외국인",
+      "n_values": 188,
+      "issues": []
+    },
+    {
+      "page": 263,
+      "survey": "일반외국인",
+      "n_values": 376,
+      "issues": []
+    },
+    {
+      "page": 264,
+      "survey": "일반외국인",
+      "n_values": 423,
+      "issues": []
+    },
+    {
+      "page": 265,
+      "survey": "일반외국인",
+      "n_values": 188,
+      "issues": []
+    },
+    {
+      "page": 266,
+      "survey": "일반외국인",
+      "n_values": 376,
+      "issues": []
+    },
+    {
+      "page": 267,
+      "survey": "일반외국인",
+      "n_values": 423,
+      "issues": []
+    },
+    {
+      "page": 268,
+      "survey": "일반외국인",
+      "n_values": 235,
+      "issues": []
+    },
+    {
+      "page": 269,
+      "survey": "일반외국인",
+      "n_values": 235,
+      "issues": []
+    },
+    {
+      "page": 270,
+      "survey": "일반외국인",
+      "n_values": 235,
+      "issues": []
+    },
+    {
+      "page": 271,
+      "survey": "일반외국인",
+      "n_values": 235,
+      "issues": []
+    },
+    {
+      "page": 272,
+      "survey": "일반외국인",
+      "n_values": 235,
+      "issues": []
+    },
+    {
+      "page": 273,
+      "survey": "일반외국인",
+      "n_values": 231,
+      "issues": []
+    },
+    {
+      "page": 274,
+      "survey": "일반외국인",
+      "n_values": 235,
+      "issues": []
+    },
+    {
+      "page": 275,
+      "survey": "일반외국인",
+      "n_values": 235,
+      "issues": []
+    },
+    {
+      "page": 276,
+      "survey": "일반외국인",
+      "n_values": 232,
+      "issues": []
+    },
+    {
+      "page": 277,
+      "survey": "일반외국인",
+      "n_values": 235,
+      "issues": []
+    },
+    {
+      "page": 278,
+      "survey": "일반외국인",
+      "n_values": 234,
+      "issues": []
+    },
+    {
+      "page": 279,
+      "survey": "일반외국인",
+      "n_values": 235,
+      "issues": []
+    },
+    {
+      "page": 280,
+      "survey": "일반외국인",
+      "n_values": 234,
+      "issues": []
+    },
+    {
+      "page": 281,
+      "survey": "일반외국인",
+      "n_values": 232,
+      "issues": []
+    },
+    {
+      "page": 282,
+      "survey": "일반외국인",
+      "n_values": 233,
+      "issues": []
+    },
+    {
+      "page": 283,
+      "survey": "일반외국인",
+      "n_values": 234,
+      "issues": []
+    },
+    {
+      "page": 284,
+      "survey": "일반외국인",
+      "n_values": 233,
+      "issues": []
+    },
+    {
+      "page": 285,
+      "survey": "일반외국인",
+      "n_values": 517,
+      "issues": []
+    },
+    {
+      "page": 286,
+      "survey": "일반외국인",
+      "n_values": 516,
+      "issues": []
+    },
+    {
+      "page": 287,
+      "survey": "일반외국인",
+      "n_values": 752,
+      "issues": []
+    },
+    {
+      "page": 288,
+      "survey": "일반외국인",
+      "n_values": 658,
+      "issues": []
+    },
+    {
+      "page": 289,
+      "survey": "일반외국인",
+      "n_values": 281,
+      "issues": []
+    },
+    {
+      "page": 290,
+      "survey": "일반외국인",
+      "n_values": 282,
+      "issues": []
+    },
+    {
+      "page": 291,
+      "survey": "일반외국인",
+      "n_values": 280,
+      "issues": []
+    },
+    {
+      "page": 292,
+      "survey": "일반외국인",
+      "n_values": 282,
+      "issues": []
+    },
+    {
+      "page": 293,
+      "survey": "일반외국인",
+      "n_values": 282,
+      "issues": []
+    },
+    {
+      "page": 294,
+      "survey": "일반외국인",
+      "n_values": 282,
+      "issues": []
+    },
+    {
+      "page": 295,
+      "survey": "일반외국인",
+      "n_values": 279,
+      "issues": []
+    },
+    {
+      "page": 296,
+      "survey": "일반외국인",
+      "n_values": 280,
+      "issues": []
+    },
+    {
+      "page": 297,
+      "survey": "일반외국인",
+      "n_values": 279,
+      "issues": []
+    },
+    {
+      "page": 298,
+      "survey": "일반외국인",
+      "n_values": 277,
+      "issues": []
+    },
+    {
+      "page": 299,
+      "survey": "일반외국인",
+      "n_values": 276,
+      "issues": []
+    },
+    {
+      "page": 300,
+      "survey": "일반외국인",
+      "n_values": 281,
+      "issues": []
+    },
+    {
+      "page": 301,
+      "survey": "일반외국인",
+      "n_values": 564,
+      "issues": []
+    },
+    {
+      "page": 302,
+      "survey": "일반외국인",
+      "n_values": 328,
+      "issues": []
+    },
+    {
+      "page": 303,
+      "survey": "일반외국인",
+      "n_values": 326,
+      "issues": []
+    },
+    {
+      "page": 304,
+      "survey": "일반외국인",
+      "n_values": 328,
+      "issues": []
+    },
+    {
+      "page": 305,
+      "survey": "일반외국인",
+      "n_values": 329,
+      "issues": []
+    },
+    {
+      "page": 306,
+      "survey": "일반외국인",
+      "n_values": 243,
+      "issues": []
+    },
+    {
+      "page": 307,
+      "survey": "일반외국인",
+      "n_values": 108,
+      "issues": []
+    },
+    {
+      "page": 308,
+      "survey": "일반외국인",
+      "n_values": 329,
+      "issues": []
+    },
+    {
+      "page": 309,
+      "survey": "일반외국인",
+      "n_values": 352,
+      "issues": []
+    },
+    {
+      "page": 311,
+      "survey": "일반외국인",
+      "n_values": 406,
+      "issues": []
+    },
+    {
+      "page": 314,
+      "survey": "방한의향자",
+      "n_values": 470,
+      "issues": []
+    },
+    {
+      "page": 315,
+      "survey": "방한의향자",
+      "n_values": 470,
+      "issues": []
+    },
+    {
+      "page": 316,
+      "survey": "방한의향자",
+      "n_values": 282,
+      "issues": []
+    },
+    {
+      "page": 317,
+      "survey": "방한의향자",
+      "n_values": 422,
+      "issues": []
+    },
+    {
+      "page": 318,
+      "survey": "방한의향자",
+      "n_values": 517,
+      "issues": []
+    },
+    {
+      "page": 319,
+      "survey": "방한의향자",
+      "n_values": 130,
+      "issues": []
+    },
+    {
+      "page": 320,
+      "survey": "방한의향자",
+      "n_values": 133,
+      "issues": []
+    },
+    {
+      "page": 321,
+      "survey": "방한의향자",
+      "n_values": 470,
+      "issues": []
+    },
+    {
+      "page": 322,
+      "survey": "방한의향자",
+      "n_values": 376,
+      "issues": []
+    },
+    {
+      "page": 323,
+      "survey": "방한의향자",
+      "n_values": 541,
+      "issues": []
+    },
+    {
+      "page": 324,
+      "survey": "방한의향자",
+      "n_values": 502,
+      "issues": []
+    },
+    {
+      "page": 325,
+      "survey": "방한의향자",
+      "n_values": 188,
+      "issues": []
+    },
+    {
+      "page": 326,
+      "survey": "방한의향자",
+      "n_values": 610,
+      "issues": []
+    },
+    {
+      "page": 327,
+      "survey": "방한의향자",
+      "n_values": 329,
+      "issues": []
+    },
+    {
+      "page": 328,
+      "survey": "방한의향자",
+      "n_values": 423,
+      "issues": []
+    },
+    {
+      "page": 329,
+      "survey": "방한의향자",
+      "n_values": 235,
+      "issues": []
+    },
+    {
+      "page": 330,
+      "survey": "방한의향자",
+      "n_values": 329,
+      "issues": []
+    },
+    {
+      "page": 331,
+      "survey": "방한의향자",
+      "n_values": 423,
+      "issues": []
+    },
+    {
+      "page": 332,
+      "survey": "방한의향자",
+      "n_values": 611,
+      "issues": []
+    },
+    {
+      "page": 333,
+      "survey": "방한의향자",
+      "n_values": 656,
+      "issues": []
+    },
+    {
+      "page": 334,
+      "survey": "방한의향자",
+      "n_values": 517,
+      "issues": []
+    },
+    {
+      "page": 335,
+      "survey": "방한의향자",
+      "n_values": 188,
+      "issues": []
+    },
+    {
+      "page": 336,
+      "survey": "방한의향자",
+      "n_values": 235,
+      "issues": []
+    },
+    {
+      "page": 337,
+      "survey": "방한의향자",
+      "n_values": 329,
+      "issues": []
+    },
+    {
+      "page": 339,
+      "survey": "방한의향자",
+      "n_values": 376,
+      "issues": []
+    },
+    {
+      "page": 340,
+      "survey": "방한의향자",
+      "n_values": 188,
+      "issues": []
+    },
+    {
+      "page": 341,
+      "survey": "방한의향자",
+      "n_values": 188,
+      "issues": []
+    },
+    {
+      "page": 342,
+      "survey": "방한의향자",
+      "n_values": 188,
+      "issues": []
+    },
+    {
+      "page": 343,
+      "survey": "방한의향자",
+      "n_values": 282,
+      "issues": []
+    },
+    {
+      "page": 344,
+      "survey": "방한의향자",
+      "n_values": 282,
+      "issues": []
+    },
+    {
+      "page": 345,
+      "survey": "방한의향자",
+      "n_values": 423,
+      "issues": []
+    },
+    {
+      "page": 346,
+      "survey": "방한의향자",
+      "n_values": 329,
+      "issues": []
+    },
+    {
+      "page": 347,
+      "survey": "방한의향자",
+      "n_values": 376,
+      "issues": []
+    },
+    {
+      "page": 348,
+      "survey": "방한의향자",
+      "n_values": 233,
+      "issues": []
+    },
+    {
+      "page": 349,
+      "survey": "방한의향자",
+      "n_values": 141,
+      "issues": []
+    },
+    {
+      "page": 350,
+      "survey": "방한의향자",
+      "n_values": 235,
+      "issues": []
+    },
+    {
+      "page": 351,
+      "survey": "방한의향자",
+      "n_values": 235,
+      "issues": []
+    },
+    {
+      "page": 352,
+      "survey": "방한의향자",
+      "n_values": 139,
+      "issues": []
+    },
+    {
+      "page": 353,
+      "survey": "방한의향자",
+      "n_values": 376,
+      "issues": []
+    },
+    {
+      "page": 354,
+      "survey": "방한의향자",
+      "n_values": 376,
+      "issues": []
+    },
+    {
+      "page": 355,
+      "survey": "방한의향자",
+      "n_values": 564,
+      "issues": []
+    },
+    {
+      "page": 356,
+      "survey": "방한의향자",
+      "n_values": 282,
+      "issues": []
+    },
+    {
+      "page": 357,
+      "survey": "방한의향자",
+      "n_values": 329,
+      "issues": []
+    },
+    {
+      "page": 358,
+      "survey": "방한의향자",
+      "n_values": 376,
+      "issues": []
+    },
+    {
+      "page": 359,
+      "survey": "방한의향자",
+      "n_values": 188,
+      "issues": []
+    },
+    {
+      "page": 360,
+      "survey": "방한의향자",
+      "n_values": 517,
+      "issues": []
+    },
+    {
+      "page": 361,
+      "survey": "방한의향자",
+      "n_values": 376,
+      "issues": []
+    }
+  ]
+}
