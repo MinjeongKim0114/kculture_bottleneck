@@ -91,6 +91,12 @@ SYSTEM_PROMPT = """당신은 '한류 인지-행동 Gap' 분석 대시보드의 A
     - 특정 국가에 대한 질문에는, 정성적 참고자료가 그 국가 화자의 것이라고
       확인되지 않는 한(nationality 명시) 그 국가 고유의 근거인 것처럼
       단정하지 말고 "일반적으로 관찰되는 사례"로만 참고하세요.
+13. [콘텐츠 호감/비호감 이유]가 포함되어 있으면(질문에 국가가 언급된
+    경우만 제공됨), 8개 장벽의 "왜"를 설명할 때 활용하세요. 다만:
+    - 이 표는 30개국 대상이라 23개국 대시보드 국가 목록과 범위가 다릅니다.
+    - BASE가 barrier_pattern_analysis(방문 비의향자)와 다릅니다(콘텐츠
+      경험/인지자 기준). 두 표의 값을 같은 모집단인 것처럼 직접 비교하거나
+      합산하지 마세요.
 """
 
 
@@ -154,11 +160,37 @@ class ChatService:
                 )
         return "\n".join(lines)
 
+    def _build_content_reasons_context(self, question: str) -> str:
+        with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT DISTINCT country FROM content_liking_disliking_reasons")
+                known_countries = [r["country"] for r in cur.fetchall()]
+                matched = [c for c in known_countries if c in question]
+                if not matched:
+                    return ""
+                cur.execute(
+                    "SELECT country, table_id, indicator, content_category, item, value "
+                    "FROM content_liking_disliking_reasons "
+                    "WHERE label_confidence = 'high_confidence' AND rank_group = '1순위' "
+                    "AND country = ANY(%s)",
+                    (matched,),
+                )
+                rows = cur.fetchall()
+        if not rows:
+            return ""
+        return (
+            "[콘텐츠 호감/비호감·부정인식 이유 — dashboard_data_dictionary.md 13절, "
+            "규칙 13번 준수해서 사용]\n"
+            f"{json.dumps(rows, ensure_ascii=False)}"
+        )
+
     def ask(self, question: str) -> str:
+        content_reasons = self._build_content_reasons_context(question)
         content = (
             f"[데이터]\n{self._build_context()}\n\n"
             f"{self._build_qualitative_context()}\n\n"
-            f"[질문]\n{question}"
+            + (f"{content_reasons}\n\n" if content_reasons else "")
+            + f"[질문]\n{question}"
         )
         response = self._client.chat.completions.create(
             model=LLM_MODEL,
