@@ -1,0 +1,31 @@
+﻿potential_tourist_country,potential_standard_country,hallyu_country,match_status,note
+중국,중국,중국,EXACT_MATCH,
+일본,일본,일본,EXACT_MATCH,
+대만,대만,대만,EXACT_MATCH,
+미국,미국,미국,EXACT_MATCH,
+필리핀,필리핀,필리핀,EXACT_MATCH,
+베트남,베트남,베트남,EXACT_MATCH,
+싱가포르,싱가포르,싱가포르,EXACT_MATCH,
+인도네시아,인도네시아,인도네시아,EXACT_MATCH,
+태국,태국,태국,EXACT_MATCH,
+말레이시아,말레이시아,말레이시아,EXACT_MATCH,
+캐나다,캐나다,캐나다,EXACT_MATCH,
+호주,호주,호주,EXACT_MATCH,
+러시아,러시아,러시아,EXACT_MATCH,
+인도,인도,인도,EXACT_MATCH,
+프랑스,프랑스,프랑스,EXACT_MATCH,
+독일,독일,독일,EXACT_MATCH,
+영국,영국,영국,EXACT_MATCH,
+멕시코,멕시코,멕시코,EXACT_MATCH,
+카자흐스탄,카자흐스탄,카자흐스탄,EXACT_MATCH,
+튀르키예,튀르키예,튀르키예,EXACT_MATCH,
+브라질,브라질,브라질,EXACT_MATCH,
+사우디아라비아,사우디아라비아,사우디아라비아,EXACT_MATCH,
+아랍에미리트,UAE,UAE,NAME_VARIATION,원표기 '아랍에미리트' -> 한류실태조사 표기 'UAE'
+,,남아프리카공화국,HALLYU_ONLY,잠재방한객조사 26개 거주국 목록에 없음 (조사 대상국 자체가 다름)
+,,스페인,HALLYU_ONLY,잠재방한객조사 26개 거주국 목록에 없음 (조사 대상국 자체가 다름)
+,,아르헨티나,HALLYU_ONLY,잠재방한객조사 26개 거주국 목록에 없음 (조사 대상국 자체가 다름)
+,,이집트,HALLYU_ONLY,잠재방한객조사 26개 거주국 목록에 없음 (조사 대상국 자체가 다름)
+,,이탈리아,HALLYU_ONLY,잠재방한객조사 26개 거주국 목록에 없음 (조사 대상국 자체가 다름)
+,,칠레,HALLYU_ONLY,잠재방한객조사 26개 거주국 목록에 없음 (조사 대상국 자체가 다름)
+,,폴란드,HALLYU_ONLY,잠재방한객조사 26개 거주국 목록에 없음 (조사 대상국 자체가 다름)
