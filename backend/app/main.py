@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import barriers, comparison, countries, gaps, overview
+from app.api.routes import barriers, chat, comparison, countries, gaps, overview
 
 app = FastAPI(
     title="Hallyu Potential Tourist Dashboard API",
@@ -17,7 +17,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_methods=["GET"],
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 
@@ -26,6 +26,7 @@ app.include_router(countries.router)
 app.include_router(gaps.router)
 app.include_router(barriers.router)
 app.include_router(comparison.router)
+app.include_router(chat.router)
 
 
 @app.get("/api/health")
