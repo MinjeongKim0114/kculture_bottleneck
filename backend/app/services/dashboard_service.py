@@ -34,6 +34,9 @@ class DashboardService:
             "indicator_distribution": self._repo.get_country_indicator_distribution(),
             "country_grid": self._build_country_grid(),
             "bottleneck_type_summary": self._repo.get_bottleneck_type_summary(),
+            "country_bottleneck_profiles": self._repo.get_bottleneck_profiles(),
+            "direct_gap": self._repo.get_gap_analysis(),
+            "conditional_gap": self._repo.get_conditional_gap_analysis(),
         }
 
     def _build_country_grid(self) -> list[dict]:

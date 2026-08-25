@@ -4,11 +4,21 @@
 files and columns exist. This module only points at their location; it does
 not redefine or duplicate the schema.
 """
+import os
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 # backend/app/core/config.py -> parents[3] == repo root
 REPO_ROOT = Path(__file__).resolve().parents[3]
 DATA_PROCESSED_DIR = REPO_ROOT / "data" / "processed"
+BACKEND_DIR = REPO_ROOT / "backend"
+
+load_dotenv(BACKEND_DIR / ".env")
+
+DATABASE_URL = os.environ.get("DATABASE_URL")
+LLM_API_KEY = os.environ.get("LLM_API_KEY")
+LLM_MODEL = os.environ.get("LLM_MODEL", "gpt-4o")
 
 
 class CsvFiles:
