@@ -207,3 +207,58 @@ create table if not exists analysis_long (
 -- 조회 패턴에 맞춘 최소 인덱스 (딕셔너리 12절: table_id로 근거 조회)
 create index if not exists idx_analysis_long_country on analysis_long (country);
 create index if not exists idx_analysis_long_table_id on analysis_long (table_id);
+
+-- =====================================================================
+-- 13. content_liking_disliking_reasons (17,960행, C급) — 콘텐츠 호감/비호감·부정인식 이유
+-- 출처: data/processed/dashboard_data_dictionary.md 13절 (2026-08-26 추가)
+-- 주의: 이 표는 한류실태조사 대상 30개국 전체를 다룬다. country_profile_base는
+-- 잠재방한객조사 기준 23개국 고정 목록이라 일부 국가(아르헨티나·칠레·이탈리아·스페인·
+-- 이집트 등 7개국)가 그쪽에는 없다 - 그래서 FK를 걸지 않는다(다른 모집단, 다른 절 참고).
+-- =====================================================================
+create table if not exists content_liking_disliking_reasons (
+    id                     bigint generated always as identity primary key,
+    country                text not null,
+    table_id               text not null,
+    indicator              text not null,
+    content_category       text,
+    item                   text not null,
+    raw_item               text not null,
+    rank_group             text not null,
+    value                  double precision not null,
+    unit                   text not null,
+    base                   double precision,
+    source_page            text,
+    extraction_method      text,
+    ocr_confidence         double precision,
+    verification_status    text,
+    notes                  text,
+    label_confidence       text check (label_confidence in ('high_confidence', 'low_confidence'))
+);
+
+create index if not exists idx_content_reasons_country on content_liking_disliking_reasons (country);
+create index if not exists idx_content_reasons_table_id on content_liking_disliking_reasons (table_id);
+
+-- =====================================================================
+-- 14. reddit_qualitative_evidence (942행, C급, private) — Reddit 정성 근거 (Track1+2)
+-- Reddit 원본(유저네임 포함)이라 public 레포에는 안 올리고 DB에만 보관한다.
+-- relevance_status는 사람이 나중에 이 테이블에서 직접 갱신한다(아직 대부분 "미검토").
+-- =====================================================================
+create table if not exists reddit_qualitative_evidence (
+    post_id                          text primary key,
+    barrier_category                 text,
+    matched_query                    text,
+    subreddit                        text,
+    permalink                        text,
+    author                           text,
+    created_utc                      bigint,
+    title                            text,
+    selftext                         text,
+    nationality_mentions_guess       text,
+    relevance_status                 text default '미검토',
+    all_matched_barrier_categories   text,
+    ai_relevance_suggestion          text,
+    ai_relevance_reason              text,
+    population_type                  text,
+    business_theme                   text,
+    business_theme_reason            text
+);
