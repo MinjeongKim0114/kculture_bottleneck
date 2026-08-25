@@ -1,0 +1,6 @@
+﻿indicator,table_id,layer,comparability,base_type,n_countries,min,q1,median,q3,max,mean,stdev
+culture_experience_rate_pct,E1A-1,Layer1_Hallyu_Exposure,direct_within_survey,전체 응답자,23,58.58,65.42,86.33,91.77,98.03,80.63,13.47
+hallyu_perception_positive_pct,1-35,Layer2_Korea_Perception,conditional,"한류경험자(한류실태조사, 별도 패널)",23,37.0,56.7,69.6,76.6,83.0,67.1,11.33
+culture_to_korea_positive_pct,E4-1,Layer2_Korea_Perception,conditional,"문화경험자(잠재방한객, 전체의 하위집합)",23,41.09,55.75,65.35,72.81,82.11,64.18,10.75
+visit_intention_positive_pct,B5B-1,Layer3_Visit_Intention,direct_within_survey,전체 응답자,23,13.14,17.26,36.6,47.98,62.67,33.98,15.94
+culture_to_visit_positive_pct,E4-3,Layer3_Visit_Intention,conditional,"문화경험자(잠재방한객, 전체의 하위집합)",23,26.28,44.61,57.12,64.35,72.88,54.95,12.22
