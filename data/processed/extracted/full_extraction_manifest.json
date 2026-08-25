@@ -1,0 +1,1758 @@
+{
+  "countries": [
+    "중국",
+    "일본",
+    "대만",
+    "태국",
+    "말레이시아",
+    "인도네시아",
+    "인도",
+    "베트남",
+    "카자흐스탄",
+    "필리핀",
+    "싱가포르",
+    "호주",
+    "미국",
+    "캐나다",
+    "멕시코",
+    "브라질",
+    "아르헨티나",
+    "칠레",
+    "영국",
+    "프랑스",
+    "이탈리아",
+    "스페인",
+    "독일",
+    "러시아",
+    "튀르키예",
+    "폴란드",
+    "UAE",
+    "사우디아라비아",
+    "남아프리카공화국",
+    "이집트"
+  ],
+  "tables": [
+    "16",
+    "33",
+    "35",
+    "41"
+  ],
+  "total_elapsed_sec": 4098.5,
+  "total_values": 810,
+  "manual_review_count": 1,
+  "duplicate_findings": [],
+  "base_mismatch_findings": [],
+  "per_country_table": [
+    {
+      "country": "중국",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        81,
+        82
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 2,
+      "elapsed_sec": 0.01,
+      "extraction_issues": []
+    },
+    {
+      "country": "중국",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        116
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 1,
+      "elapsed_sec": 0.01,
+      "extraction_issues": []
+    },
+    {
+      "country": "중국",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        118
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 1,
+      "elapsed_sec": 0.0,
+      "extraction_issues": []
+    },
+    {
+      "country": "중국",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        121
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 1,
+      "elapsed_sec": 0.01,
+      "extraction_issues": []
+    },
+    {
+      "country": "일본",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        141,
+        142
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 76.18,
+      "extraction_issues": []
+    },
+    {
+      "country": "일본",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        176
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 32.8,
+      "extraction_issues": []
+    },
+    {
+      "country": "일본",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        178
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 27.21,
+      "extraction_issues": []
+    },
+    {
+      "country": "일본",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        181
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 43.51,
+      "extraction_issues": []
+    },
+    {
+      "country": "대만",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        201,
+        202
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 75.39,
+      "extraction_issues": []
+    },
+    {
+      "country": "대만",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        236
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 28.97,
+      "extraction_issues": []
+    },
+    {
+      "country": "대만",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        238
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 20.14,
+      "extraction_issues": []
+    },
+    {
+      "country": "대만",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        241
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 33.94,
+      "extraction_issues": []
+    },
+    {
+      "country": "태국",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        261,
+        262
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 71.31,
+      "extraction_issues": []
+    },
+    {
+      "country": "태국",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        296
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 33.09,
+      "extraction_issues": []
+    },
+    {
+      "country": "태국",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        298
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 25.31,
+      "extraction_issues": []
+    },
+    {
+      "country": "태국",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        301
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 41.77,
+      "extraction_issues": []
+    },
+    {
+      "country": "말레이시아",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        321,
+        322
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 68.08,
+      "extraction_issues": []
+    },
+    {
+      "country": "말레이시아",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        356
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 26.7,
+      "extraction_issues": []
+    },
+    {
+      "country": "말레이시아",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        358
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 18.17,
+      "extraction_issues": []
+    },
+    {
+      "country": "말레이시아",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        361
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 36.57,
+      "extraction_issues": []
+    },
+    {
+      "country": "인도네시아",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        381,
+        382
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 64.98,
+      "extraction_issues": []
+    },
+    {
+      "country": "인도네시아",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        416
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 29.02,
+      "extraction_issues": []
+    },
+    {
+      "country": "인도네시아",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        418
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 23.51,
+      "extraction_issues": []
+    },
+    {
+      "country": "인도네시아",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        421
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 36.06,
+      "extraction_issues": []
+    },
+    {
+      "country": "인도",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        441,
+        442
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 44.76,
+      "extraction_issues": []
+    },
+    {
+      "country": "인도",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        476
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 19.59,
+      "extraction_issues": []
+    },
+    {
+      "country": "인도",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        478
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 18.46,
+      "extraction_issues": []
+    },
+    {
+      "country": "인도",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        481
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 28.24,
+      "extraction_issues": []
+    },
+    {
+      "country": "베트남",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        501,
+        502
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 2,
+      "elapsed_sec": 0.02,
+      "extraction_issues": []
+    },
+    {
+      "country": "베트남",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        536
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 1,
+      "elapsed_sec": 0.01,
+      "extraction_issues": []
+    },
+    {
+      "country": "베트남",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        538
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 1,
+      "elapsed_sec": 0.01,
+      "extraction_issues": []
+    },
+    {
+      "country": "베트남",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        541
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 1,
+      "elapsed_sec": 0.01,
+      "extraction_issues": []
+    },
+    {
+      "country": "카자흐스탄",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        561,
+        562
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 49.27,
+      "extraction_issues": []
+    },
+    {
+      "country": "카자흐스탄",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        596
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 21.59,
+      "extraction_issues": []
+    },
+    {
+      "country": "카자흐스탄",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        598
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 18.7,
+      "extraction_issues": []
+    },
+    {
+      "country": "카자흐스탄",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        601
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 31.83,
+      "extraction_issues": []
+    },
+    {
+      "country": "필리핀",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        621,
+        622
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 49.21,
+      "extraction_issues": []
+    },
+    {
+      "country": "필리핀",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        656
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 21.35,
+      "extraction_issues": []
+    },
+    {
+      "country": "필리핀",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        658
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 19.49,
+      "extraction_issues": []
+    },
+    {
+      "country": "필리핀",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        661
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 27.96,
+      "extraction_issues": []
+    },
+    {
+      "country": "싱가포르",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        681,
+        682
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 56.03,
+      "extraction_issues": []
+    },
+    {
+      "country": "싱가포르",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        716
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 44.89,
+      "extraction_issues": []
+    },
+    {
+      "country": "싱가포르",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        718
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 22.02,
+      "extraction_issues": []
+    },
+    {
+      "country": "싱가포르",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        721
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 38.14,
+      "extraction_issues": []
+    },
+    {
+      "country": "호주",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        741,
+        742
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 62.9,
+      "extraction_issues": []
+    },
+    {
+      "country": "호주",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        776
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 23.12,
+      "extraction_issues": []
+    },
+    {
+      "country": "호주",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        778
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 18.01,
+      "extraction_issues": []
+    },
+    {
+      "country": "호주",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        781
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 37.39,
+      "extraction_issues": []
+    },
+    {
+      "country": "미국",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        801,
+        802
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 2,
+      "elapsed_sec": 0.02,
+      "extraction_issues": []
+    },
+    {
+      "country": "미국",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        836
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 1,
+      "elapsed_sec": 0.01,
+      "extraction_issues": []
+    },
+    {
+      "country": "미국",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        838
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 1,
+      "elapsed_sec": 0.01,
+      "extraction_issues": []
+    },
+    {
+      "country": "미국",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        841
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 1,
+      "elapsed_sec": 0.01,
+      "extraction_issues": []
+    },
+    {
+      "country": "캐나다",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        861,
+        862
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 70.58,
+      "extraction_issues": []
+    },
+    {
+      "country": "캐나다",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        896
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 20.59,
+      "extraction_issues": []
+    },
+    {
+      "country": "캐나다",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        898
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 17.33,
+      "extraction_issues": []
+    },
+    {
+      "country": "캐나다",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        901
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 32.57,
+      "extraction_issues": []
+    },
+    {
+      "country": "멕시코",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        921,
+        922
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 72.96,
+      "extraction_issues": []
+    },
+    {
+      "country": "멕시코",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        956
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 22.23,
+      "extraction_issues": []
+    },
+    {
+      "country": "멕시코",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        958
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 20.94,
+      "extraction_issues": []
+    },
+    {
+      "country": "멕시코",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        961
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 40.38,
+      "extraction_issues": []
+    },
+    {
+      "country": "브라질",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        981,
+        982
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 58.81,
+      "extraction_issues": []
+    },
+    {
+      "country": "브라질",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        1016
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 28.29,
+      "extraction_issues": []
+    },
+    {
+      "country": "브라질",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        1018
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 29.11,
+      "extraction_issues": []
+    },
+    {
+      "country": "브라질",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        1021
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 40.3,
+      "extraction_issues": []
+    },
+    {
+      "country": "아르헨티나",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        1041,
+        1042
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 63.05,
+      "extraction_issues": []
+    },
+    {
+      "country": "아르헨티나",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        1076
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 20.21,
+      "extraction_issues": []
+    },
+    {
+      "country": "아르헨티나",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        1078
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 24.19,
+      "extraction_issues": []
+    },
+    {
+      "country": "아르헨티나",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        1081
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 40.56,
+      "extraction_issues": []
+    },
+    {
+      "country": "칠레",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        1101,
+        1102
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 60.25,
+      "extraction_issues": []
+    },
+    {
+      "country": "칠레",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        1136
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 23.66,
+      "extraction_issues": []
+    },
+    {
+      "country": "칠레",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        1138
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 21.07,
+      "extraction_issues": []
+    },
+    {
+      "country": "칠레",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        1141
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 32.42,
+      "extraction_issues": []
+    },
+    {
+      "country": "영국",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        1161,
+        1162
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 68.73,
+      "extraction_issues": []
+    },
+    {
+      "country": "영국",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        1196
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 30.12,
+      "extraction_issues": []
+    },
+    {
+      "country": "영국",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        1198
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 25.57,
+      "extraction_issues": []
+    },
+    {
+      "country": "영국",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        1201
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 39.83,
+      "extraction_issues": []
+    },
+    {
+      "country": "프랑스",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        1221,
+        1222
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 59.3,
+      "extraction_issues": []
+    },
+    {
+      "country": "프랑스",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        1256
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 30.78,
+      "extraction_issues": []
+    },
+    {
+      "country": "프랑스",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        1258
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 18.4,
+      "extraction_issues": []
+    },
+    {
+      "country": "프랑스",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        1261
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 37.82,
+      "extraction_issues": []
+    },
+    {
+      "country": "이탈리아",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        1281,
+        1282
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 69.33,
+      "extraction_issues": []
+    },
+    {
+      "country": "이탈리아",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        1316
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 30.6,
+      "extraction_issues": []
+    },
+    {
+      "country": "이탈리아",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        1318
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 26.88,
+      "extraction_issues": []
+    },
+    {
+      "country": "이탈리아",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        1321
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 41.0,
+      "extraction_issues": []
+    },
+    {
+      "country": "스페인",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        1341,
+        1342
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 63.41,
+      "extraction_issues": []
+    },
+    {
+      "country": "스페인",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        1376
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 27.35,
+      "extraction_issues": []
+    },
+    {
+      "country": "스페인",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        1378
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 26.07,
+      "extraction_issues": []
+    },
+    {
+      "country": "스페인",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        1381
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 42.89,
+      "extraction_issues": []
+    },
+    {
+      "country": "독일",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        1401,
+        1402
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 59.38,
+      "extraction_issues": []
+    },
+    {
+      "country": "독일",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        1436
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 31.62,
+      "extraction_issues": []
+    },
+    {
+      "country": "독일",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        1438
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 29.74,
+      "extraction_issues": []
+    },
+    {
+      "country": "독일",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        1441
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 47.55,
+      "extraction_issues": []
+    },
+    {
+      "country": "러시아",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        1461,
+        1462
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 81.19,
+      "extraction_issues": []
+    },
+    {
+      "country": "러시아",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        1496
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 32.95,
+      "extraction_issues": []
+    },
+    {
+      "country": "러시아",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        1498
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 27.42,
+      "extraction_issues": []
+    },
+    {
+      "country": "러시아",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        1501
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 44.66,
+      "extraction_issues": []
+    },
+    {
+      "country": "튀르키예",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        1521,
+        1522
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 76.95,
+      "extraction_issues": []
+    },
+    {
+      "country": "튀르키예",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        1556
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 32.8,
+      "extraction_issues": []
+    },
+    {
+      "country": "튀르키예",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        1558
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 27.54,
+      "extraction_issues": []
+    },
+    {
+      "country": "튀르키예",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        1561
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 31.35,
+      "extraction_issues": []
+    },
+    {
+      "country": "폴란드",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        1581,
+        1582
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 55.5,
+      "extraction_issues": []
+    },
+    {
+      "country": "폴란드",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        1616
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 28.19,
+      "extraction_issues": []
+    },
+    {
+      "country": "폴란드",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        1618
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 22.27,
+      "extraction_issues": []
+    },
+    {
+      "country": "폴란드",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        1621
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 34.27,
+      "extraction_issues": []
+    },
+    {
+      "country": "UAE",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        1641,
+        1642
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 58.32,
+      "extraction_issues": []
+    },
+    {
+      "country": "UAE",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        1676
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 29.42,
+      "extraction_issues": []
+    },
+    {
+      "country": "UAE",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        1678
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 24.81,
+      "extraction_issues": []
+    },
+    {
+      "country": "UAE",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        1681
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 37.38,
+      "extraction_issues": []
+    },
+    {
+      "country": "사우디아라비아",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        1701,
+        1702
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 60.76,
+      "extraction_issues": []
+    },
+    {
+      "country": "사우디아라비아",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        1736
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 21.96,
+      "extraction_issues": []
+    },
+    {
+      "country": "사우디아라비아",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        1738
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 19.4,
+      "extraction_issues": []
+    },
+    {
+      "country": "사우디아라비아",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        1741
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 31.07,
+      "extraction_issues": []
+    },
+    {
+      "country": "남아프리카공화국",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        1761,
+        1762
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 64.23,
+      "extraction_issues": []
+    },
+    {
+      "country": "남아프리카공화국",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        1796
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 27.29,
+      "extraction_issues": []
+    },
+    {
+      "country": "남아프리카공화국",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        1798
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 26.37,
+      "extraction_issues": []
+    },
+    {
+      "country": "남아프리카공화국",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        1801
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 33.5,
+      "extraction_issues": []
+    },
+    {
+      "country": "이집트",
+      "table_id": "1-16",
+      "indicator": "호감도",
+      "pages": [
+        1821,
+        1822
+      ],
+      "status": "ok",
+      "n_values": 13,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 68.38,
+      "extraction_issues": []
+    },
+    {
+      "country": "이집트",
+      "table_id": "1-33",
+      "indicator": "관심도",
+      "pages": [
+        1856
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 29.68,
+      "extraction_issues": []
+    },
+    {
+      "country": "이집트",
+      "table_id": "1-35",
+      "indicator": "인식변화",
+      "pages": [
+        1858
+      ],
+      "status": "ok",
+      "n_values": 6,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 26.95,
+      "extraction_issues": []
+    },
+    {
+      "country": "이집트",
+      "table_id": "1-41",
+      "indicator": "관광경험",
+      "pages": [
+        1861
+      ],
+      "status": "ok",
+      "n_values": 2,
+      "n_issues": 0,
+      "cache_hits": 0,
+      "elapsed_sec": 32.1,
+      "extraction_issues": []
+    }
+  ],
+  "note": "duplicate_findings corrected after fixing key-name bug (content_category -> category) in anomaly_checks.check_duplicates"
+}

@@ -1,0 +1,2 @@
+﻿country,table_id,indicator,category,item,value,unit,base,source_page,extraction_method,ocr_confidence,verification_status,notes
+필리핀,1-16,호감도,패션,5점 척도 평균(점),417.0,score(1-5),387.0,"621,622",easyocr+label_targeted_row_lookup,0.3721,manual_review,"값 범위 이상: 417.0 (기대범위 1.0~5.0, 단위=score(1-5)) — 소수점 누락(예: 3.3->33) 또는 자릿수 오류 의심; 5점 척도인데 417.0 > 5 — 소수점 누락 의심"
