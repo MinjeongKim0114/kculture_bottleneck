@@ -20,6 +20,7 @@ from app.core.config import DATABASE_URL  # noqa: E402
 SCHEMA_SQL = REPO_ROOT / "backend" / "db" / "schema.sql"
 CONTENT_REASONS_CSV = REPO_ROOT / "data" / "processed" / "extracted" / "tables_17_18_37_key_values_clean.csv"
 REDDIT_CSV = REPO_ROOT / "data" / "processed" / "qualitative" / "reddit_candidates_business_classified.csv"
+SURVEY_2025_CSV = REPO_ROOT / "data" / "processed" / "extracted" / "potential_tourist_2025_key_values.csv"
 
 
 def ensure_schema(conn):
@@ -65,11 +66,28 @@ def load_reddit_evidence(conn):
     print(f"reddit_qualitative_evidence: {len(df)}행 적재")
 
 
+def load_2025_survey(conn):
+    df = pd.read_csv(SURVEY_2025_CSV, encoding="utf-8-sig")
+    df = df.where(pd.notna(df), None)
+    cols = ["survey", "page", "topic", "base_desc", "group", "segment", "sample_n", "item", "value"]
+    with conn.cursor() as cur:
+        cur.execute("TRUNCATE potential_tourist_2025_survey RESTART IDENTITY")
+        with cur.copy(
+            'COPY potential_tourist_2025_survey (survey, page, topic, base_desc, "group", '
+            'segment, sample_n, item, value) FROM STDIN'
+        ) as copy:
+            for row in df[cols].itertuples(index=False, name=None):
+                copy.write_row(row)
+    conn.commit()
+    print(f"potential_tourist_2025_survey: {len(df)}행 적재")
+
+
 def main():
     with psycopg.connect(DATABASE_URL) as conn:
         ensure_schema(conn)
         load_content_reasons(conn)
         load_reddit_evidence(conn)
+        load_2025_survey(conn)
 
 
 if __name__ == "__main__":

@@ -264,3 +264,25 @@ create table if not exists reddit_qualitative_evidence (
     business_theme_reason            text
 );
 alter table reddit_qualitative_evidence enable row level security;
+
+-- =====================================================================
+-- 15. potential_tourist_2025_survey (39,667행, C급) — 2025 잠재방한여행객조사
+-- 출처: data/processed/dashboard_data_dictionary.md 15절 (2026-08-26 추가)
+-- 주의: 26개국 대상. country_profile_base(23개국)와 다른 리스트라 FK 걸지 않음.
+-- =====================================================================
+create table if not exists potential_tourist_2025_survey (
+    id           bigint generated always as identity primary key,
+    survey       text not null,
+    page         int,
+    topic        text not null,
+    base_desc    text,
+    "group"      text not null,
+    segment      text not null,
+    sample_n     double precision,
+    item         text not null,
+    value        double precision not null
+);
+
+create index if not exists idx_2025survey_segment on potential_tourist_2025_survey (segment);
+create index if not exists idx_2025survey_topic on potential_tourist_2025_survey (topic);
+alter table potential_tourist_2025_survey enable row level security;
