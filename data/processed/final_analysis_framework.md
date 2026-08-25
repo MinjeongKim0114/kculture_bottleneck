@@ -156,6 +156,18 @@
   `bottleneck_typology_report.md`의 방법론/재현 절차 서술 부분
 - 국가 매핑/지표 매핑 검증 자료(`potential_hallyu_country_mapping.csv`,
   `potential_hallyu_indicator_mapping.csv`, `potential_tourist_extraction_validation.csv` 등 이전 단계 산출물)
+- **`content_liking_disliking_reasons`(dashboard_data_dictionary.md 13절, 2026-08-26 추가)** —
+  콘텐츠 호감/비호감·부정인식 이유. 8개 장벽의 "왜"를 설문이 직접 안 물어서 생긴 공백을
+  메우는 근거 자료. 30개국(23개국 아님, 13절 참고) 대상이라 다른 표와 국가 범위가 다름 —
+  기본 화면에 바로 노출하지 않고, AI가 특정 국가·장벽의 "왜"를 설명할 때 조회한다.
+- **`reddit_qualitative_evidence`(dashboard_data_dictionary.md 14절, 2026-08-26 추가, private DB)** —
+  Reddit에서 수집한 체류/방문 외국인의 정성적 페인포인트. 설문과 완전히 다른 모집단(자기
+  선택 편향)이라 통계로 취급하지 않는다. 관광 장벽 설명(Track 1)과 사업 기회 테마(Track 2)
+  두 축으로 분류되어 있으며, population_type/business_theme은 AI 1차 판정으로 사람이
+  최종 검토하지 않았다(2026-08-26 기준). 챗봇이 사업 기회 관련 질문에 답할 때 6개 테마
+  요약을 상시 참고자료로 사용하되, 국적이 확인되지 않은 사례를 특정 국가 근거처럼
+  단정하지 않는다(`chat_service.py` 규칙 12번). 유저네임 등 개인 식별 정보를 포함하므로
+  public 레포에는 원본을 올리지 않고 Supabase에만 보관한다.
 
 이유: 분석의 재현성과 신뢰성을 담보하기 위해 반드시 보존해야 하지만, 최종 사용자가 매 화면에서 볼 필요는
 없다. AI Analyst가 "이 수치의 근거가 뭐야?"라는 질문에 답할 때 참조하는 배경 자료로 취급한다.
