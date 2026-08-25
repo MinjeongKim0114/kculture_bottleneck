@@ -1,0 +1,20 @@
+﻿country,table_id,page,category,item,value,unit,base,source_page,extraction_method,verification_status,notes
+중국,1-16,82,호감도,전반적 만족도 - 5점 척도 평균(전체),3.78,score(1-5),2100,82,manual_read_verified_by_ocr_crosscheck,verified,콘텐츠 경험자 기준 BASE
+미국,1-16,802,호감도,전반적 만족도 - 5점 척도 평균(전체),3.96,score(1-5),1300,802,manual_read_verified_by_ocr_crosscheck,verified,콘텐츠 경험자 기준 BASE
+베트남,1-16,502,호감도,전반적 만족도 - 5점 척도 평균(전체),3.99,score(1-5),900,502,manual_read_verified_by_ocr_crosscheck,verified,콘텐츠 경험자 기준 BASE
+중국,1-33,116,관심도,본인 관심도 변화(1년전대비) - 5점 척도 평균(전체),3.36,score(1-5),2100,116,manual_read_verified_by_ocr_crosscheck,verified,BASE=전체 응답자
+미국,1-33,836,관심도,본인 관심도 변화(1년전대비) - 5점 척도 평균(전체),3.7,score(1-5),1300,836,manual_read_verified_by_ocr_crosscheck,verified,BASE=전체 응답자
+베트남,1-33,536,관심도,본인 관심도 변화(1년전대비) - 5점 척도 평균(전체),3.69,score(1-5),900,536,manual_read_verified_by_ocr_crosscheck,verified,BASE=전체 응답자
+중국,1-35,118,인식변화,5점 척도 평균(전체),3.56,score(1-5),2100,118,manual_read_verified_by_ocr_crosscheck,verified,BASE=전체 응답자
+중국,1-35,118,인식변화,"① 매우 부정적으로 변함(%, 전체)",1.6,%,2100,118,manual_read_verified_by_ocr_crosscheck,verified,
+중국,1-35,118,인식변화,"④ 약간 긍정적으로 변함(%, 전체)",41.6,%,2100,118,manual_read_verified_by_ocr_crosscheck,verified,
+미국,1-35,838,인식변화,5점 척도 평균(전체),3.92,score(1-5),1300,838,manual_read_verified_by_ocr_crosscheck,verified,BASE=전체 응답자
+미국,1-35,838,인식변화,"③ 변화 없음(%, 전체)",28.2,%,1300,838,manual_read_verified_by_ocr_crosscheck,verified,
+베트남,1-35,538,인식변화,5점 척도 평균(전체),4.02,score(1-5),900,538,manual_read_verified_by_ocr_crosscheck,verified,BASE=전체 응답자
+베트남,1-35,538,인식변화,"⑤ 매우 긍정적으로 변함(%, 전체)",29.3,%,900,538,manual_read_verified_by_ocr_crosscheck,verified,
+중국,1-41,121,관광경험,"한국 관광 - 구매(방문) 경험률(%, 전체)",62.2,%,2100,121,manual_read_verified_by_ocr_crosscheck,verified,최근 4년간 기준
+중국,1-41,121,관광경험,"한국 관광 - 평균 구매(방문) 횟수(회, 전체)",1.21,회,2100,121,manual_read_verified_by_ocr_crosscheck,verified,최근 4년간 기준
+미국,1-41,841,관광경험,"한국 관광 - 구매(방문) 경험률(%, 전체)",36.9,%,1300,841,manual_read_verified_by_ocr_crosscheck,verified,최근 4년간 기준
+미국,1-41,841,관광경험,"한국 관광 - 평균 구매(방문) 횟수(회, 전체)",1.38,회,1300,841,manual_read_verified_by_ocr_crosscheck,verified,최근 4년간 기준
+베트남,1-41,541,관광경험,"한국 관광 - 구매(방문) 경험률(%, 전체)",53.3,%,900,541,manual_read_verified_by_ocr_crosscheck,verified,최근 4년간 기준
+베트남,1-41,541,관광경험,"한국 관광 - 평균 구매(방문) 횟수(회, 전체)",1.34,회,900,541,manual_read_verified_by_ocr_crosscheck,verified,최근 4년간 기준

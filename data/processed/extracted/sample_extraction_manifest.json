@@ -1,0 +1,248 @@
+[
+  {
+    "country": "중국",
+    "table_id": "1-16",
+    "pages": [
+      81,
+      82
+    ],
+    "page_results": [
+      {
+        "page": 81,
+        "image": "..\\processed\\page_images\\중국_1-16_p81.png",
+        "ocr_raw": "..\\processed\\ocr_raw\\중국_1-16_p81_ocr_raw.json",
+        "extracted": "..\\processed\\extracted\\중국_1-16_p81_extracted.json",
+        "status": "manual_review",
+        "n_boxes": 695,
+        "elapsed_sec": 44.0
+      },
+      {
+        "page": 82,
+        "image": "..\\processed\\page_images\\중국_1-16_p82.png",
+        "ocr_raw": "..\\processed\\ocr_raw\\중국_1-16_p82_ocr_raw.json",
+        "extracted": "..\\processed\\extracted\\중국_1-16_p82_extracted.json",
+        "status": "manual_review",
+        "n_boxes": 564,
+        "elapsed_sec": 28.68
+      }
+    ]
+  },
+  {
+    "country": "중국",
+    "table_id": "1-33",
+    "pages": [
+      116
+    ],
+    "page_results": [
+      {
+        "page": 116,
+        "image": "..\\processed\\page_images\\중국_1-33_p116.png",
+        "ocr_raw": "..\\processed\\ocr_raw\\중국_1-33_p116_ocr_raw.json",
+        "extracted": "..\\processed\\extracted\\중국_1-33_p116_extracted.json",
+        "status": "manual_review",
+        "n_boxes": 521,
+        "elapsed_sec": 24.36
+      }
+    ]
+  },
+  {
+    "country": "중국",
+    "table_id": "1-35",
+    "pages": [
+      118
+    ],
+    "page_results": [
+      {
+        "page": 118,
+        "image": "..\\processed\\page_images\\중국_1-35_p118.png",
+        "ocr_raw": "..\\processed\\ocr_raw\\중국_1-35_p118_ocr_raw.json",
+        "extracted": "..\\processed\\extracted\\중국_1-35_p118_extracted.json",
+        "status": "manual_review",
+        "n_boxes": 383,
+        "elapsed_sec": 20.4
+      }
+    ]
+  },
+  {
+    "country": "중국",
+    "table_id": "1-41",
+    "pages": [
+      121
+    ],
+    "page_results": [
+      {
+        "page": 121,
+        "image": "..\\processed\\page_images\\중국_1-41_p121.png",
+        "ocr_raw": "..\\processed\\ocr_raw\\중국_1-41_p121_ocr_raw.json",
+        "extracted": "..\\processed\\extracted\\중국_1-41_p121_extracted.json",
+        "status": "manual_review",
+        "n_boxes": 764,
+        "elapsed_sec": 29.83
+      }
+    ]
+  },
+  {
+    "country": "미국",
+    "table_id": "1-16",
+    "pages": [
+      801,
+      802
+    ],
+    "page_results": [
+      {
+        "page": 801,
+        "image": "..\\processed\\page_images\\미국_1-16_p801.png",
+        "ocr_raw": "..\\processed\\ocr_raw\\미국_1-16_p801_ocr_raw.json",
+        "extracted": "..\\processed\\extracted\\미국_1-16_p801_extracted.json",
+        "status": "manual_review",
+        "n_boxes": 689,
+        "elapsed_sec": 26.43
+      },
+      {
+        "page": 802,
+        "image": "..\\processed\\page_images\\미국_1-16_p802.png",
+        "ocr_raw": "..\\processed\\ocr_raw\\미국_1-16_p802_ocr_raw.json",
+        "extracted": "..\\processed\\extracted\\미국_1-16_p802_extracted.json",
+        "status": "manual_review",
+        "n_boxes": 566,
+        "elapsed_sec": 22.39
+      }
+    ]
+  },
+  {
+    "country": "미국",
+    "table_id": "1-33",
+    "pages": [
+      836
+    ],
+    "page_results": [
+      {
+        "page": 836,
+        "image": "..\\processed\\page_images\\미국_1-33_p836.png",
+        "ocr_raw": "..\\processed\\ocr_raw\\미국_1-33_p836_ocr_raw.json",
+        "extracted": "..\\processed\\extracted\\미국_1-33_p836_extracted.json",
+        "status": "manual_review",
+        "n_boxes": 517,
+        "elapsed_sec": 21.95
+      }
+    ]
+  },
+  {
+    "country": "미국",
+    "table_id": "1-35",
+    "pages": [
+      838
+    ],
+    "page_results": [
+      {
+        "page": 838,
+        "image": "..\\processed\\page_images\\미국_1-35_p838.png",
+        "ocr_raw": "..\\processed\\ocr_raw\\미국_1-35_p838_ocr_raw.json",
+        "extracted": "..\\processed\\extracted\\미국_1-35_p838_extracted.json",
+        "status": "manual_review",
+        "n_boxes": 381,
+        "elapsed_sec": 19.15
+      }
+    ]
+  },
+  {
+    "country": "미국",
+    "table_id": "1-41",
+    "pages": [
+      841
+    ],
+    "page_results": [
+      {
+        "page": 841,
+        "image": "..\\processed\\page_images\\미국_1-41_p841.png",
+        "ocr_raw": "..\\processed\\ocr_raw\\미국_1-41_p841_ocr_raw.json",
+        "extracted": "..\\processed\\extracted\\미국_1-41_p841_extracted.json",
+        "status": "manual_review",
+        "n_boxes": 765,
+        "elapsed_sec": 32.03
+      }
+    ]
+  },
+  {
+    "country": "베트남",
+    "table_id": "1-16",
+    "pages": [
+      501,
+      502
+    ],
+    "page_results": [
+      {
+        "page": 501,
+        "image": "..\\processed\\page_images\\베트남_1-16_p501.png",
+        "ocr_raw": "..\\processed\\ocr_raw\\베트남_1-16_p501_ocr_raw.json",
+        "extracted": "..\\processed\\extracted\\베트남_1-16_p501_extracted.json",
+        "status": "manual_review",
+        "n_boxes": 641,
+        "elapsed_sec": 27.78
+      },
+      {
+        "page": 502,
+        "image": "..\\processed\\page_images\\베트남_1-16_p502.png",
+        "ocr_raw": "..\\processed\\ocr_raw\\베트남_1-16_p502_ocr_raw.json",
+        "extracted": "..\\processed\\extracted\\베트남_1-16_p502_extracted.json",
+        "status": "manual_review",
+        "n_boxes": 523,
+        "elapsed_sec": 22.23
+      }
+    ]
+  },
+  {
+    "country": "베트남",
+    "table_id": "1-33",
+    "pages": [
+      536
+    ],
+    "page_results": [
+      {
+        "page": 536,
+        "image": "..\\processed\\page_images\\베트남_1-33_p536.png",
+        "ocr_raw": "..\\processed\\ocr_raw\\베트남_1-33_p536_ocr_raw.json",
+        "extracted": "..\\processed\\extracted\\베트남_1-33_p536_extracted.json",
+        "status": "manual_review",
+        "n_boxes": 479,
+        "elapsed_sec": 21.87
+      }
+    ]
+  },
+  {
+    "country": "베트남",
+    "table_id": "1-35",
+    "pages": [
+      538
+    ],
+    "page_results": [
+      {
+        "page": 538,
+        "image": "..\\processed\\page_images\\베트남_1-35_p538.png",
+        "ocr_raw": "..\\processed\\ocr_raw\\베트남_1-35_p538_ocr_raw.json",
+        "extracted": "..\\processed\\extracted\\베트남_1-35_p538_extracted.json",
+        "status": "manual_review",
+        "n_boxes": 354,
+        "elapsed_sec": 19.17
+      }
+    ]
+  },
+  {
+    "country": "베트남",
+    "table_id": "1-41",
+    "pages": [
+      541
+    ],
+    "page_results": [
+      {
+        "page": 541,
+        "image": "..\\processed\\page_images\\베트남_1-41_p541.png",
+        "ocr_raw": "..\\processed\\ocr_raw\\베트남_1-41_p541_ocr_raw.json",
+        "extracted": "..\\processed\\extracted\\베트남_1-41_p541_extracted.json",
+        "status": "manual_review",
+        "n_boxes": 689,
+        "elapsed_sec": 27.33
+      }
+    ]
+  }
+]
