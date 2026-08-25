@@ -34,6 +34,18 @@ THEME_CLUSTERS = {
     "의료/헬스케어 통역·안내": ["의료 통역 서비스", "의료 관광"],
 }
 
+# 표마다 국가명 표기가 다른 경우가 있다(확인된 것: 23개국 표는 "UAE", 2025 설문은
+# "아랍에미리트"). 어느 쪽 이름으로 조회하든 같은 별칭 그룹을 찾을 수 있도록 양방향으로 검사한다.
+COUNTRY_ALIAS_GROUPS = [["UAE", "아랍에미리트"]]
+
+
+def _country_search_terms(country: str) -> list[str]:
+    for group in COUNTRY_ALIAS_GROUPS:
+        if country in group:
+            return group
+    return [country]
+
+
 SYSTEM_PROMPT = """당신은 '한류 인지-행동 Gap' 분석 대시보드의 AI Analyst입니다.
 사용자 메시지에 포함된 [데이터] JSON에 있는 값만 근거로 답변하세요.
 
@@ -97,6 +109,24 @@ SYSTEM_PROMPT = """당신은 '한류 인지-행동 Gap' 분석 대시보드의 A
     - BASE가 barrier_pattern_analysis(방문 비의향자)와 다릅니다(콘텐츠
       경험/인지자 기준). 두 표의 값을 같은 모집단인 것처럼 직접 비교하거나
       합산하지 마세요.
+14. [국가별 관찰 로그](country_bottleneck_observations)가 포함되어 있으면,
+    `detail`과 `confidence` 필드를 재요약하지 말고 원문 그대로 인용하세요.
+    이건 이미 사람이 다른 표들을 근거로 미리 정리해둔 관찰 문장입니다.
+15. [2025 잠재방한여행객조사]가 포함되어 있으면:
+    - 이 데이터는 **국가 총계만** 있습니다. "성별", "연령별" 세그먼트는
+      해당 국가만의 값이 아니라 26개국 전체를 합친 값이라 함께 제공하지
+      않습니다. 따라서 사용자가 "이 국가를 세그먼트별로 분석해줘"라고
+      물어도, 이 데이터로는 국가×연령/성별 교차 분석이 불가능합니다.
+      억지로 만들어내지 말고 "이 조사는 국가 단위 집계까지만 제공하며,
+      국가 안에서 연령/성별로 다시 나눈 값은 없다"고 솔직히 답하세요.
+    - 23개국 표와 조사 자체가 다르므로(26개국, 2025년 별도 회차) 같은
+      지표의 반복측정처럼 직접 비교하지 말고, "다른 조사에서도 유사한
+      경향이 참고로 관찰된다" 정도로만 쓰세요.
+16. analysis_long이 포함되어 있으면, 이건 다른 모든 표의 계산 원천
+    롱포맷입니다. 이미 인용한 값의 출처(어느 table_id/조사에서 나왔는지)를
+    확인하는 용도로만 쓰고, 여기서 새로운 값을 계산하거나 다른 표와 다른
+    숫자가 나오면 그 표 값을 우선하세요(가공되지 않은 원천이라 반올림 등의
+    차이가 있을 수 있음).
 """
 
 
@@ -184,12 +214,94 @@ class ChatService:
             f"{json.dumps(rows, ensure_ascii=False)}"
         )
 
+    def _match_country(self, question: str, known: list[str]) -> list[str]:
+        return [c for c in known if any(term in question for term in _country_search_terms(c))]
+
+    def _build_bottleneck_observations_context(self, question: str) -> str:
+        with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT DISTINCT country FROM country_bottleneck_observations")
+                known = [r["country"] for r in cur.fetchall()]
+                matched = self._match_country(question, known)
+                if not matched:
+                    return ""
+                cur.execute(
+                    "SELECT country, comparability_class, observation_type, detail, confidence "
+                    "FROM country_bottleneck_observations WHERE country = ANY(%s)",
+                    (matched,),
+                )
+                rows = cur.fetchall()
+        if not rows:
+            return ""
+        return (
+            "[국가별 관찰 로그 — dashboard_data_dictionary.md 11절, 규칙 14번 준수]\n"
+            f"{json.dumps(rows, ensure_ascii=False)}"
+        )
+
+    def _build_2025_survey_context(self, question: str) -> str:
+        with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT DISTINCT segment FROM potential_tourist_2025_survey WHERE \"group\" = '거주국별'"
+                )
+                known = [r["segment"] for r in cur.fetchall()]
+                matched = self._match_country(question, known)
+                if not matched:
+                    return ""
+                # 국가당 최대 826행까지 나올 수 있어 컨텍스트 초과를 유발한 적이 있음
+                # (실측: UAE 826행 + analysis_long 246행 → 128k 토큰 한도 초과) - 상한을 둔다.
+                cur.execute(
+                    "SELECT topic, segment, sample_n, item, value "
+                    "FROM potential_tourist_2025_survey "
+                    "WHERE \"group\" = '거주국별' AND segment = ANY(%s) "
+                    "ORDER BY page LIMIT 300",
+                    (matched,),
+                )
+                rows = cur.fetchall()
+        if not rows:
+            return ""
+        return (
+            "[2025 잠재방한여행객조사 — dashboard_data_dictionary.md 15절, 규칙 15번 준수. "
+            "국가 총계만 있음, 성별/연령별 세그먼트 없음. 컨텍스트 크기 제한으로 일부 항목만 포함됨]\n"
+            f"{json.dumps(rows, ensure_ascii=False)}"
+        )
+
+    def _build_analysis_long_context(self, question: str) -> str:
+        with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT DISTINCT country FROM analysis_long")
+                known = [r["country"] for r in cur.fetchall()]
+                matched = self._match_country(question, known)
+                if not matched:
+                    return ""
+                cur.execute(
+                    "SELECT country, layer, source_survey, table_id, indicator, "
+                    "response_option, base_type, sample_n, value, unit, comparability, note "
+                    "FROM analysis_long WHERE country = ANY(%s)",
+                    (matched,),
+                )
+                rows = cur.fetchall()
+        if not rows:
+            return ""
+        return (
+            "[analysis_long (원천 롱포맷) — dashboard_data_dictionary.md 12절, 규칙 16번 준수]\n"
+            f"{json.dumps(rows, ensure_ascii=False)}"
+        )
+
     def ask(self, question: str) -> str:
-        content_reasons = self._build_content_reasons_context(question)
+        # analysis_long은 다른 표들의 원천 롱포맷이라 내용이 중복이고, 국가당 최대
+        # 수백 행이라 상시 주입하면 컨텍스트 한도를 넘긴다(dashboard_data_dictionary.md
+        # 12절 설계 의도대로 "출처 확인용"으로만 남겨두고 기본 주입에서는 제외한다).
+        blocks = [
+            self._build_content_reasons_context(question),
+            self._build_bottleneck_observations_context(question),
+            self._build_2025_survey_context(question),
+        ]
+        extra = "\n\n".join(b for b in blocks if b)
         content = (
             f"[데이터]\n{self._build_context()}\n\n"
             f"{self._build_qualitative_context()}\n\n"
-            + (f"{content_reasons}\n\n" if content_reasons else "")
+            + (f"{extra}\n\n" if extra else "")
             + f"[질문]\n{question}"
         )
         response = self._client.chat.completions.create(
