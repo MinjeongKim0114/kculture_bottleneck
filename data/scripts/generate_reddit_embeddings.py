@@ -9,10 +9,13 @@ reddit_qualitative_evidence의 각 행(942건)에 임베딩을 생성해 저장�
 게시물 원문뿐 아니라 AI가 판단한 사업 테마/이유까지 포함해야, "할랄푸드 사업
 기회 있어?" 같은 질문이 본문에 "할랄"이라는 단어가 없는 게시물도 찾을 수 있다.
 
-재분류(classify_business_opportunity_themes.py)로 business_theme이 바뀔 때마다
-이 스크립트도 다시 돌려야 한다 — population_type/business_theme이 바뀐 행만
-다시 임베딩하지 않고, 매번 전체를 다시 계산한다(942건 규모라 비용/시간 부담 작음).
+기본적으로 embedding이 아직 없는 행(신규 수집분)만 처리한다 - 주간 증분 수집을
+전제로 한 설계. business_theme 라벨링 프롬프트를 고쳐서 기존 행까지 재분류했다면
+(`classify_business_opportunity_themes.py --full`), 그 행들은 population_type/
+business_theme은 바뀌었지만 embedding 컬럼은 옛날 값 그대로 남아있으므로
+`--full`로 이 스크립트도 같이 재실행해야 한다.
 """
+import argparse
 from pathlib import Path
 
 import psycopg
@@ -51,18 +54,26 @@ def build_text(row: dict) -> str:
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--full", action="store_true",
+        help="embedding이 이미 있는 행도 전부 다시 계산(라벨을 --full로 재분류했을 때만 사용).",
+    )
+    args = parser.parse_args()
+
     db_url, api_key = load_env()
     client = OpenAI(api_key=api_key)
 
     with psycopg.connect(db_url, row_factory=dict_row) as conn:
         register_vector(conn)
         with conn.cursor() as cur:
+            where = "" if args.full else "WHERE embedding IS NULL"
             cur.execute(
                 "SELECT post_id, title, selftext, business_theme, business_theme_reason "
-                "FROM reddit_qualitative_evidence"
+                f"FROM reddit_qualitative_evidence {where}"
             )
             rows = cur.fetchall()
-        print(f"임베딩 대상: {len(rows)}건")
+        print(f"임베딩 대상: {len(rows)}건" + ("" if args.full else " (embedding IS NULL만)"))
 
         for start in range(0, len(rows), BATCH_SIZE):
             batch = rows[start:start + BATCH_SIZE]

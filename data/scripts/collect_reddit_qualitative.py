@@ -167,20 +167,33 @@ def main():
 
     for barrier_key, query, subreddit in combos:
         raw_path = RAW_DIR / f"{barrier_key}__{subreddit}__{query.replace(' ', '_')}.json"
+        existing_posts: list[dict] = []
         if raw_path.exists():
-            print(f"[{barrier_key}] query='{query}' subreddit=r/{subreddit} - 캐시 재사용")
-            continue
+            with open(raw_path, encoding="utf-8") as f:
+                existing_posts = json.load(f)
 
         print(f"[{barrier_key}] query='{query}' subreddit=r/{subreddit}")
         try:
-            posts = search_posts(query, subreddit)
+            new_posts = search_posts(query, subreddit)
         except requests.RequestException as e:
-            print(f"  실패: {e} (캐시 없이 다음 조합으로, 나중에 재실행하면 이 조합만 다시 시도됨)")
+            print(f"  실패: {e} (기존 캐시 유지, 나중에 재실행하면 이 조합만 다시 시도됨)")
             time.sleep(REQUEST_DELAY_SEC)
             continue
 
+        # 매 실행마다 API가 검색 시점 기준 상위 LIMIT_PER_QUERY건만 반환하므로, 그냥
+        # 덮어쓰면 이전에 수집했지만 이번엔 순위 밖으로 밀린 오래된 글이 사라진다.
+        # post_id 기준으로 기존 것과 합쳐서 계속 누적한다(주간 실행 전제).
+        merged = {p["id"]: p for p in existing_posts if p.get("id")}
+        added = 0
+        for p in new_posts:
+            if p.get("id") and p["id"] not in merged:
+                added += 1
+            if p.get("id"):
+                merged[p["id"]] = p
+        print(f"  신규 {added}건 추가 (누적 {len(merged)}건)")
+
         with open(raw_path, "w", encoding="utf-8") as f:
-            json.dump(posts, f, ensure_ascii=False, indent=2)
+            json.dump(list(merged.values()), f, ensure_ascii=False, indent=2)
         time.sleep(REQUEST_DELAY_SEC)
 
     # CSV는 이번 실행 성공 여부와 무관하게, 지금까지 캐시된 모든 raw json에서 매번 새로

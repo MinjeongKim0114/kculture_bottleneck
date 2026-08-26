@@ -49,21 +49,27 @@ def load_content_reasons(conn):
 
 
 def load_reddit_evidence(conn):
+    """post_id 기준 upsert. TRUNCATE를 쓰지 않는 이유: 이 테이블은 주간 증분 수집
+    대상이라, 매번 통째로 비우면 embedding 컬럼(별도 스크립트로 생성, 여기서는
+    건드리지 않음)까지 다시 계산해야 한다. INSERT/ON CONFLICT로 CSV에 있는 컬럼만
+    갱신하고 embedding은 그대로 둔다."""
     df = pd.read_csv(REDDIT_CSV, encoding="utf-8-sig")
     df = df.where(pd.notna(df), None)
     cols = ["post_id", "barrier_category", "matched_query", "subreddit", "permalink",
             "author", "created_utc", "title", "selftext", "nationality_mentions_guess",
             "relevance_status", "all_matched_barrier_categories", "ai_relevance_suggestion",
             "ai_relevance_reason", "population_type", "business_theme", "business_theme_reason"]
+    update_cols = [c for c in cols if c != "post_id"]
+    sql = (
+        f"INSERT INTO reddit_qualitative_evidence ({', '.join(cols)}) "
+        f"VALUES ({', '.join(['%s'] * len(cols))}) "
+        f"ON CONFLICT (post_id) DO UPDATE SET "
+        + ", ".join(f"{c} = EXCLUDED.{c}" for c in update_cols)
+    )
     with conn.cursor() as cur:
-        cur.execute("TRUNCATE reddit_qualitative_evidence")
-        with cur.copy(
-            f"COPY reddit_qualitative_evidence ({', '.join(cols)}) FROM STDIN"
-        ) as copy:
-            for row in df[cols].itertuples(index=False, name=None):
-                copy.write_row(row)
+        cur.executemany(sql, df[cols].itertuples(index=False, name=None))
     conn.commit()
-    print(f"reddit_qualitative_evidence: {len(df)}행 적재")
+    print(f"reddit_qualitative_evidence: {len(df)}행 upsert 완료")
 
 
 def load_2025_survey(conn):

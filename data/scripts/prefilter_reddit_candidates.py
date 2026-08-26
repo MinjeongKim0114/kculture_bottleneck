@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
@@ -25,6 +26,9 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 IN_CSV = REPO_ROOT / "data" / "processed" / "qualitative" / "reddit_candidates.csv"
 OUT_REVIEW_CSV = REPO_ROOT / "data" / "processed" / "qualitative" / "reddit_candidates_for_review.csv"
 OUT_EXCLUDED_CSV = REPO_ROOT / "data" / "processed" / "qualitative" / "reddit_candidates_auto_excluded.csv"
+# 이번 실행에서 새로 처리한 것만 기록 - n8n 파이프라인이 "이번 주 신규 중 애매만"
+# 골라 이메일로 보낼 때 이 파일을 읽는다(과거 누적분과 섞이지 않도록).
+RUN_SUMMARY_JSON = REPO_ROOT / "data" / "processed" / "qualitative" / "_last_prefilter_run.json"
 
 BACKEND_ENV = REPO_ROOT / "backend" / ".env"
 
@@ -117,18 +121,67 @@ def classify_batch(client: OpenAI, rows: list[dict]) -> dict[int, dict]:
     return out
 
 
+def write_run_summary(new_total: int, ambiguous_df: pd.DataFrame) -> None:
+    ambiguous_cols = ["post_id", "barrier_category", "title", "permalink", "ai_relevance_reason"]
+    ambiguous = (
+        ambiguous_df[ambiguous_cols].to_dict("records") if not ambiguous_df.empty else []
+    )
+    RUN_SUMMARY_JSON.write_text(
+        json.dumps(
+            {
+                "run_at": datetime.now(timezone.utc).isoformat(),
+                "new_total": new_total,
+                "ambiguous_count": len(ambiguous),
+                "ambiguous": ambiguous,
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+
 def main():
     df = pd.read_csv(IN_CSV, encoding="utf-8-sig")
-    print(f"원본: {len(df)}건")
+    print(f"원본(누적): {len(df)}건")
 
     df = dedupe(df)
     print(f"중복 제거 후: {len(df)}건 (post_id 기준 고유)")
+
+    # 이미 처리된 post_id(리뷰 대상이든 자동제외든)는 다시 건드리지 않는다 - 사람이
+    # reddit_candidates_for_review.csv에서 이미 검토/수정한 행을 매주 재실행마다
+    # 덮어쓰지 않기 위함. 주간 수집 시 새로 잡힌 post_id만 처리한다.
+    existing_review = (
+        pd.read_csv(OUT_REVIEW_CSV, encoding="utf-8-sig") if OUT_REVIEW_CSV.exists()
+        else pd.DataFrame(columns=df.columns)
+    )
+    existing_excluded = (
+        pd.read_csv(OUT_EXCLUDED_CSV, encoding="utf-8-sig") if OUT_EXCLUDED_CSV.exists()
+        else pd.DataFrame(columns=df.columns)
+    )
+    known_ids = set(existing_review.get("post_id", [])) | set(existing_excluded.get("post_id", []))
+    df = df[~df["post_id"].isin(known_ids)].reset_index(drop=True)
+    print(f"신규 post_id만: {len(df)}건 (기존 {len(known_ids)}건은 건드리지 않음)")
+
+    if df.empty:
+        print("신규 게시물 없음 - 종료")
+        write_run_summary(0, pd.DataFrame())
+        return
 
     remaining, excluded = split_auto_excluded(df)
     print(f"명백히 무관(자동 제외): {len(excluded)}건")
     print(f"AI 1차 판정 대상: {len(remaining)}건")
 
+    if not excluded.empty:
+        excluded = pd.concat([existing_excluded, excluded], ignore_index=True)
+    else:
+        excluded = existing_excluded
     excluded.to_csv(OUT_EXCLUDED_CSV, index=False, encoding="utf-8-sig")
+
+    if remaining.empty:
+        print("AI 판정 대상 없음(전부 자동 제외됨) - 종료")
+        write_run_summary(len(df), pd.DataFrame())
+        return
 
     api_key = load_dotenv_key()
     client = OpenAI(api_key=api_key)
@@ -156,18 +209,21 @@ def main():
     # relevance_status는 사람이 최종 확정하는 컬럼 - AI 제안과 분리, 절대 자동으로 채우지 않음
     remaining["relevance_status"] = "미검토"
 
-    remaining = remaining.sort_values(
+    combined = pd.concat([existing_review, remaining], ignore_index=True)
+    combined = combined.sort_values(
         by="ai_relevance_suggestion",
-        key=lambda s: s.map({"관련": 0, "애매": 1, "무관": 2}),
+        key=lambda s: s.map({"관련": 0, "애매": 1, "무관": 2}).fillna(3),
     )
-    remaining.to_csv(OUT_REVIEW_CSV, index=False, encoding="utf-8-sig")
+    combined.to_csv(OUT_REVIEW_CSV, index=False, encoding="utf-8-sig")
 
-    print(f"\n저장: {OUT_REVIEW_CSV} ({len(remaining)}건, AI 제안 '관련'부터 정렬됨)")
-    print(f"저장: {OUT_EXCLUDED_CSV} ({len(excluded)}건, 자동 제외 - 검토 안 해도 됨)")
-    print("\nAI 제안 분포:")
+    print(f"\n저장: {OUT_REVIEW_CSV} (신규 {len(remaining)}건 추가, 총 {len(combined)}건)")
+    print(f"저장: {OUT_EXCLUDED_CSV} (총 {len(excluded)}건)")
+    print("\n이번에 새로 추가된 건의 AI 제안 분포:")
     print(remaining["ai_relevance_suggestion"].value_counts())
-    print("\n다음 단계: reddit_candidates_for_review.csv를 열어서 relevance_status 컬럼을")
-    print("사람이 직접 채우세요. ai_relevance_suggestion은 참고용일 뿐 확정이 아닙니다.")
+
+    ambiguous = remaining[remaining["ai_relevance_suggestion"] == "애매"]
+    write_run_summary(len(remaining), ambiguous)
+    print(f"\n이번 실행 요약 저장: {RUN_SUMMARY_JSON} (신규 {len(remaining)}건 중 애매 {len(ambiguous)}건)")
 
 
 if __name__ == "__main__":

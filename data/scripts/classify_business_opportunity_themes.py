@@ -20,6 +20,7 @@ Reddit 후보군 전체(942건)를 "관광 장벽 매칭" 기준이 아니라, �
 """
 from __future__ import annotations
 
+import argparse
 import json
 import time
 from pathlib import Path
@@ -128,10 +129,28 @@ def classify_batch(client: OpenAI, rows: list[dict]) -> dict[int, dict]:
 
 
 def main():
-    # 트랙1에서 "무관"으로 밀린 것도 포함해서 전체(942건)를 다시 본다 - 트랙2 후보는
-    # 오히려 거기 더 많이 있을 것으로 예상됨.
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--full", action="store_true",
+        help="이미 분류된 post_id까지 전부 다시 분류(프롬프트를 고쳤을 때만 사용). "
+             "기본값은 신규 post_id만 분류하고 기존 라벨(사람이 검증한 것 포함)은 보존.",
+    )
+    args = parser.parse_args()
+
     df = pd.read_csv(IN_CSV, encoding="utf-8-sig").reset_index(drop=True)
-    print(f"전체 재분류 대상: {len(df)}건")
+    print(f"reddit_candidates_for_review.csv 전체: {len(df)}건")
+
+    existing = pd.DataFrame()
+    if not args.full and OUT_CSV.exists():
+        existing = pd.read_csv(OUT_CSV, encoding="utf-8-sig")
+        already_done = set(existing["post_id"])
+        df = df[~df["post_id"].isin(already_done)].reset_index(drop=True)
+        print(f"기존 분류 보존: {len(already_done)}건 (건드리지 않음)")
+
+    print(f"이번에 분류할 건수: {len(df)}건")
+    if df.empty:
+        print("신규 분류 대상 없음 - 종료")
+        return
 
     api_key = load_dotenv_key()
     client = OpenAI(api_key=api_key)
@@ -156,13 +175,15 @@ def main():
     df["population_type"] = pop_types
     df["business_theme"] = themes
     df["business_theme_reason"] = reasons
-    df.to_csv(OUT_CSV, index=False, encoding="utf-8-sig")
 
-    print(f"\n저장: {OUT_CSV}")
-    print("\npopulation_type 분포:")
-    print(df["population_type"].value_counts())
-    print("\nbusiness_theme 상위 20개 (빈 값 제외):")
-    print(df[df["business_theme"] != ""]["business_theme"].value_counts().head(20))
+    combined = pd.concat([existing, df], ignore_index=True) if not existing.empty else df
+    combined.to_csv(OUT_CSV, index=False, encoding="utf-8-sig")
+
+    print(f"\n저장: {OUT_CSV} (총 {len(combined)}건, 이번에 신규/재분류 {len(df)}건)")
+    print("\npopulation_type 분포(전체):")
+    print(combined["population_type"].value_counts())
+    print("\nbusiness_theme 상위 20개 (빈 값 제외, 전체):")
+    print(combined[combined["business_theme"].fillna("") != ""]["business_theme"].value_counts().head(20))
 
 
 if __name__ == "__main__":
