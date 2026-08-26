@@ -8,7 +8,6 @@ import LoadingState from "@/components/LoadingState";
 import ErrorState from "@/components/ErrorState";
 import WorldMap from "@/components/map/WorldMap";
 import CountryDetailPanel from "@/components/map/CountryDetailPanel";
-import GapSection from "@/components/GapSection";
 import CountryGrid from "@/components/CountryGrid";
 import BottleneckSummary from "@/components/BottleneckSummary";
 
@@ -112,14 +111,10 @@ export default function OverviewPage() {
 
           <div
             style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 16,
               height: 260,
             }}
             className="overview-summary-grid"
           >
-            <GapSection directGap={data.direct_gap} conditionalGap={data.conditional_gap} compact />
             <BottleneckSummary data={data.bottleneck_type_summary} compact />
           </div>
 

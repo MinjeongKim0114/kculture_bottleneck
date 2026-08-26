@@ -22,6 +22,10 @@
   --gridline: #e1e0d9;
   --baseline: #c3c2b7;
 
+  /* 격차 강도 배지: 색조를 강도별로 바꾸지 않고 텍스트로만 강도를 구분한다 (단일 톤 고정) */
+  --tone-gap-bg: #fbe9df;
+  --tone-gap-text: #9a4a24;
+
   --radius-lg: 20px;
   --radius-md: 14px;
   --radius-sm: 8px;
@@ -44,6 +48,20 @@ body {
   color: var(--text-primary);
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
+  /* 한글은 기본적으로 글자 단위로 줄바꿈되므로, 단어(어절) 단위로만 줄바꿈되게 강제한다 */
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+details.caveat > summary {
+  cursor: pointer;
+  list-style: revert;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+details.caveat > summary::marker {
+  color: var(--text-muted);
 }
 
 a {
@@ -85,6 +103,12 @@ button {
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
+}
+
+@media (min-width: 1300px) {
+  .detail-metric-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
 }
 
 @media (max-width: 900px) {

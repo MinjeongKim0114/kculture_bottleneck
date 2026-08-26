@@ -5,43 +5,92 @@ import { ApiError, getCountryDetail } from "@/lib/api";
 import type { CountryBottleneckProfile, CountryDetailResponse } from "@/types/api";
 
 const FLAG_LABELS: { key: keyof CountryBottleneckProfile; label: string }[] = [
-  { key: "direct_gap_type_flag", label: "A · Direct Gap" },
-  { key: "conditional_gap_type_flag", label: "B · Conditional Gap" },
-  { key: "cognition_interest_barrier_flag", label: "C · 인지/관심" },
-  { key: "image_barrier_flag", label: "D · 이미지" },
-  { key: "economic_physical_access_barrier_flag", label: "E · 경제/물리적 접근성" },
-  { key: "institutional_language_barrier_flag", label: "F · 제도/언어" },
-  { key: "religious_cultural_env_barrier_flag", label: "G · 종교/문화환경" },
+  { key: "direct_gap_type_flag", label: "A 격차상위(전체)" },
+  { key: "conditional_gap_type_flag", label: "B 격차상위(경험자)" },
+  { key: "cognition_interest_barrier_flag", label: "C 인지/관심" },
+  { key: "image_barrier_flag", label: "D 이미지" },
+  { key: "economic_physical_access_barrier_flag", label: "E 경제/물리적 접근성" },
+  { key: "institutional_language_barrier_flag", label: "F 제도/언어" },
+  { key: "religious_cultural_env_barrier_flag", label: "G 종교/문화환경" },
 ];
 
-function TierTag({ tier }: { tier: string }) {
+// gap_tier 원본 문자열("Gap_큼(상위3분위)")은 통계적 정의를 그대로 서술한 것이라 일반 사용자에게
+// 직관적이지 않다는 피드백(BottleneckSummary와 동일한 이유)에 따라 화면 표시용으로만 순화한다.
+// 원본 값은 title 툴팁으로 그대로 남겨 정보 손실은 없다.
+const GAP_TIER_LABELS: Record<string, string> = {
+  "Gap_큼(상위3분위)": "격차 큰 편",
+  "Gap_중간(중위3분위)": "격차 보통",
+  "Gap_작음(하위3분위)": "격차 작은 편",
+};
+
+function GapTierBadge({ tier }: { tier: string }) {
   return (
     <span
+      title={tier}
       style={{
-        fontSize: 10,
-        color: "var(--text-muted)",
-        border: "1px solid var(--gridline)",
+        fontSize: 12,
+        fontWeight: 500,
+        color: "var(--tone-gap-text)",
+        background: "var(--tone-gap-bg)",
         borderRadius: 999,
-        padding: "1px 7px",
-        marginLeft: 6,
+        padding: "4px 12px",
         whiteSpace: "nowrap",
+        flexShrink: 0,
       }}
     >
-      {tier}
+      {GAP_TIER_LABELS[tier] ?? tier}
     </span>
   );
 }
 
-function IndicatorRow({ label, value, tier }: { label: string; value: number; tier?: string }) {
+function GapCard({ label, valuePct, tier }: { label: string; valuePct: number; tier: string }) {
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, padding: "5px 0" }}>
-      <span style={{ color: "var(--text-secondary)" }}>{label}</span>
-      <span>
-        <span className="tabular-nums" style={{ fontWeight: 600 }}>
-          {value.toFixed(1)}%
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        gap: 12,
+        background: "var(--card-bg-soft)",
+        border: "1px solid var(--gridline)",
+        borderRadius: "var(--radius-md)",
+        padding: "14px 16px",
+      }}
+    >
+      <div>
+        <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 4 }}>{label}</div>
+        <div className="tabular-nums" style={{ fontSize: 24, fontWeight: 500 }}>
+          {valuePct.toFixed(1)}%p
+        </div>
+      </div>
+      <GapTierBadge tier={tier} />
+    </div>
+  );
+}
+
+function MetricCard({ label, value, tier }: { label: string; value: number; tier?: string }) {
+  return (
+    <div title={tier ? `23개국 중 상대적 위치: ${tier}` : undefined}>
+      <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 4 }}>{label}</div>
+      <div className="tabular-nums" style={{ fontSize: 20, fontWeight: 500 }}>
+        {value.toFixed(1)}%
+      </div>
+    </div>
+  );
+}
+
+function BarrierBar({ label, ratePct }: { label: string; ratePct: number }) {
+  return (
+    <div style={{ padding: "6px 0" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
+        <span style={{ color: "var(--text-secondary)" }}>{label}</span>
+        <span className="tabular-nums" style={{ fontWeight: 500 }}>
+          {ratePct.toFixed(1)}%
         </span>
-        {tier && <TierTag tier={tier} />}
-      </span>
+      </div>
+      <div style={{ height: 6, borderRadius: 4, background: "var(--card-bg-soft)", border: "1px solid var(--gridline)", overflow: "hidden" }}>
+        <div style={{ width: `${ratePct}%`, height: "100%", background: "var(--accent-blue)", borderRadius: 4 }} />
+      </div>
     </div>
   );
 }
@@ -110,86 +159,74 @@ export default function CountryDetailPanel({ country }: { country: string | null
 
       {country && !loading && !error && detail && (
         <div>
-          <h2 style={{ fontSize: 18, margin: "0 0 2px" }}>{detail.profile.country}</h2>
-          <p style={{ fontSize: 11, color: "var(--text-muted)", margin: "0 0 14px" }}>
-            국가 선택 상세 · Country Explorer는 다음 단계에서 전체 화면으로 제공됩니다.
-          </p>
-
-          <div style={{ borderTop: "1px solid var(--gridline)", paddingTop: 10 }}>
-            <h3 style={{ fontSize: 12, margin: "0 0 4px", color: "var(--text-muted)" }}>Layer 1~3 핵심 지표</h3>
-            <IndicatorRow
-              label="문화경험률 (E1A-1)"
-              value={detail.profile.culture_experience_rate_pct}
-              tier={detail.pattern_profile.culture_experience_rate_pct_tier}
-            />
-            <IndicatorRow
-              label="방한의향 있음률 (B5B-1)"
-              value={detail.profile.visit_intention_positive_pct}
-              tier={detail.pattern_profile.visit_intention_positive_pct_tier}
-            />
-            <IndicatorRow
-              label="문화경험→호감도 (E4-1)"
-              value={detail.profile.culture_to_korea_positive_pct}
-              tier={detail.pattern_profile.culture_to_korea_positive_pct_tier}
-            />
-            <IndicatorRow
-              label="문화경험→방문의향 (E4-3)"
-              value={detail.profile.culture_to_visit_positive_pct}
-              tier={detail.pattern_profile.culture_to_visit_positive_pct_tier}
-            />
-            <p style={{ fontSize: 10, color: "var(--text-muted)", margin: "4px 0 0" }}>
-              tercile은 23개국 중 상대적 위치이며 절대적 좋음/나쁨이 아닙니다.
-            </p>
-          </div>
+          <h2 style={{ fontSize: 20, fontWeight: 500, margin: "0 0 2px" }}>{detail.profile.country}</h2>
+          <p style={{ fontSize: 11, color: "var(--text-muted)", margin: "0 0 14px" }}>국가 선택 상세</p>
 
           {(detail.direct_gap || detail.conditional_gap) && (
-            <div style={{ borderTop: "1px solid var(--gridline)", paddingTop: 10, marginTop: 12 }}>
-              <h3 style={{ fontSize: 12, margin: "0 0 4px", color: "var(--text-muted)" }}>
-                Gap (서로 다른 BASE의 별개 관찰값)
-              </h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {detail.direct_gap && (
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, padding: "4px 0" }}>
-                  <span style={{ color: "var(--text-secondary)" }}>Direct Gap</span>
-                  <span className="tabular-nums" style={{ fontWeight: 600 }}>
-                    {detail.direct_gap.observed_gap_pct_point.toFixed(1)}%p
-                    <TierTag tier={detail.direct_gap.gap_tier} />
-                  </span>
-                </div>
+                <GapCard
+                  label="문화경험률 대비 방한의향 격차"
+                  valuePct={detail.direct_gap.observed_gap_pct_point}
+                  tier={detail.direct_gap.gap_tier}
+                />
               )}
               {detail.conditional_gap && (
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, padding: "4px 0" }}>
-                  <span style={{ color: "var(--text-secondary)" }}>Conditional Gap</span>
-                  <span className="tabular-nums" style={{ fontWeight: 600 }}>
-                    {detail.conditional_gap.observed_conditional_gap_pct_point.toFixed(1)}%p
-                    <TierTag tier={detail.conditional_gap.gap_tier} />
-                  </span>
-                </div>
+                <GapCard
+                  label="문화경험자의 호감도 대비 방문의향 격차"
+                  valuePct={detail.conditional_gap.observed_conditional_gap_pct_point}
+                  tier={detail.conditional_gap.gap_tier}
+                />
               )}
             </div>
           )}
 
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(2, 1fr)",
+              gap: 12,
+              marginTop: 18,
+              paddingTop: 14,
+              borderTop: "1px solid var(--gridline)",
+            }}
+            className="detail-metric-grid"
+          >
+            <MetricCard
+              label="한류경험률"
+              value={detail.profile.culture_experience_rate_pct}
+              tier={detail.pattern_profile.culture_experience_rate_pct_tier}
+            />
+            <MetricCard
+              label="방한의향"
+              value={detail.profile.visit_intention_positive_pct}
+              tier={detail.pattern_profile.visit_intention_positive_pct_tier}
+            />
+            <MetricCard
+              label="경험 후 호감도"
+              value={detail.profile.culture_to_korea_positive_pct}
+              tier={detail.pattern_profile.culture_to_korea_positive_pct_tier}
+            />
+            <MetricCard
+              label="경험 후 방문의향"
+              value={detail.profile.culture_to_visit_positive_pct}
+              tier={detail.pattern_profile.culture_to_visit_positive_pct_tier}
+            />
+          </div>
+
           {detail.top_barriers.length > 0 && (
-            <div style={{ borderTop: "1px solid var(--gridline)", paddingTop: 10, marginTop: 12 }}>
-              <h3 style={{ fontSize: 12, margin: "0 0 4px", color: "var(--text-muted)" }}>
+            <div style={{ borderTop: "1px solid var(--gridline)", paddingTop: 12, marginTop: 16 }}>
+              <h3 style={{ fontSize: 12, margin: "0 0 6px", color: "var(--text-muted)" }}>
                 주요 장벽 Top{detail.top_barriers.length} (방문 비의향자 기준)
               </h3>
               {detail.top_barriers.map((b) => (
-                <div key={b.barrier} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, padding: "3px 0" }}>
-                  <span style={{ color: "var(--text-secondary)" }}>{b.barrier.replace(/_/g, " ")}</span>
-                  <span className="tabular-nums">{b.rate_pct.toFixed(1)}%</span>
-                </div>
+                <BarrierBar key={b.barrier} label={b.barrier.replace(/_/g, " ")} ratePct={b.rate_pct} />
               ))}
-              {detail.barrier_pattern && (
-                <p style={{ fontSize: 10, color: "var(--text-muted)", margin: "4px 0 0" }}>
-                  표본 n={detail.barrier_pattern.sample_n}
-                  {detail.barrier_pattern.small_sample_flag === "Y" && " · 소표본 주의(30명 미만)"}
-                </p>
-              )}
             </div>
           )}
 
           {detail.bottleneck_profile && (
-            <div style={{ borderTop: "1px solid var(--gridline)", paddingTop: 10, marginTop: 12 }}>
+            <div style={{ borderTop: "1px solid var(--gridline)", paddingTop: 12, marginTop: 16 }}>
               <h3 style={{ fontSize: 12, margin: "0 0 6px", color: "var(--text-muted)" }}>병목 프로파일</h3>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
                 {FLAG_LABELS.map(({ key, label }) => {
@@ -205,6 +242,7 @@ export default function CountryDetailPanel({ country }: { country: string | null
                         color: isFlagged ? "var(--accent-primary)" : "var(--text-muted)",
                         border: `1px solid ${isFlagged ? "var(--accent-primary)" : "var(--gridline)"}`,
                         opacity: isFlagged ? 1 : 0.5,
+                        whiteSpace: "nowrap",
                       }}
                     >
                       {label}
@@ -212,14 +250,34 @@ export default function CountryDetailPanel({ country }: { country: string | null
                   );
                 })}
               </div>
-              <p style={{ fontSize: 12, margin: "0 0 8px", lineHeight: 1.5 }}>
+              <p style={{ fontSize: 12, margin: 0, lineHeight: 1.5 }}>
                 {detail.bottleneck_profile.key_observed_pattern || "해당 없음"}
-              </p>
-              <p style={{ fontSize: 10, color: "var(--text-muted)", margin: 0, lineHeight: 1.4 }}>
-                {detail.bottleneck_profile.interpretation_caution}
               </p>
             </div>
           )}
+
+          <details className="caveat" style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid var(--gridline)" }}>
+            <summary>계산 기준 및 해석 주의사항</summary>
+            <div style={{ fontSize: 11, color: "var(--text-muted)", lineHeight: 1.6, marginTop: 8 }}>
+              <p style={{ margin: "0 0 6px" }}>
+                핵심 지표의 상대적 위치(23개국 중 상·중·하위)는 항목에 마우스를 올리면 볼 수 있으며, 절대적인
+                좋음/나쁨을 뜻하지 않습니다.
+              </p>
+              <p style={{ margin: "0 0 6px" }}>
+                Direct Gap과 Conditional Gap은 서로 다른 기준 응답자 집단에서 계산된 별개 관찰값으로, 직접
+                비교할 수 없습니다.
+              </p>
+              {detail.barrier_pattern && (
+                <p style={{ margin: "0 0 6px" }}>
+                  주요 장벽 표본 n={detail.barrier_pattern.sample_n}
+                  {detail.barrier_pattern.small_sample_flag === "Y" && " · 소표본 주의(30명 미만)"}
+                </p>
+              )}
+              {detail.bottleneck_profile?.interpretation_caution && (
+                <p style={{ margin: 0 }}>{detail.bottleneck_profile.interpretation_caution}</p>
+              )}
+            </div>
+          </details>
         </div>
       )}
     </section>
