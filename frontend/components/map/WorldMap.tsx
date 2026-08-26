@@ -2,42 +2,21 @@
 
 import { useMemo, useState } from "react";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
-import type {
-  CountryBottleneckProfile,
-  CountryGridItem,
-  IndicatorDistribution,
-} from "@/types/api";
+import type { CountryGridItem, IndicatorDistribution } from "@/types/api";
 import { COUNTRY_NAME_TO_GEO_ID, GEO_ID_TO_COUNTRY_NAME } from "@/lib/countryGeo";
 import { normalize, sequentialBlue, SEQUENTIAL_BLUE_DARK, SEQUENTIAL_BLUE_LIGHT } from "@/lib/colorScale";
 
 const GEO_URL = "/countries-50m.json";
 
-export type MapIndicator =
-  | "culture_experience_rate_pct"
-  | "visit_intention_positive_pct"
-  | "observed_gap_pct_point"
-  | "bottleneck_type_count";
+export type MapIndicator = "culture_experience_rate_pct" | "visit_intention_positive_pct" | "observed_gap_pct_point";
 
+// 통계 용어("~률", "Direct Gap")는 처음 보는 사용자에게 와닿지 않는다는 피드백에 따라
+// 지도 토글 버튼만 누구나 바로 이해할 수 있는 쉬운 말로 표현한다. 값의 정의 자체는 바뀌지 않는다.
 const INDICATOR_OPTIONS: { value: MapIndicator; label: string }[] = [
-  { value: "culture_experience_rate_pct", label: "문화경험률" },
-  { value: "visit_intention_positive_pct", label: "방한의향 있음률" },
-  { value: "observed_gap_pct_point", label: "Direct Gap" },
-  { value: "bottleneck_type_count", label: "병목 유형 수 (A~G)" },
+  { value: "culture_experience_rate_pct", label: "한류 경험" },
+  { value: "visit_intention_positive_pct", label: "방한 의향" },
+  { value: "observed_gap_pct_point", label: "경험-방문 격차" },
 ];
-
-const TYPE_FLAG_KEYS: (keyof CountryBottleneckProfile)[] = [
-  "direct_gap_type_flag",
-  "conditional_gap_type_flag",
-  "cognition_interest_barrier_flag",
-  "image_barrier_flag",
-  "economic_physical_access_barrier_flag",
-  "institutional_language_barrier_flag",
-  "religious_cultural_env_barrier_flag",
-];
-
-function countTypeFlags(profile: CountryBottleneckProfile): number {
-  return TYPE_FLAG_KEYS.reduce((n, key) => n + (profile[key] === "Y" ? 1 : 0), 0);
-}
 
 interface CountryValue {
   value: number;
@@ -46,13 +25,11 @@ interface CountryValue {
 
 export default function WorldMap({
   countryGrid,
-  bottleneckProfiles,
   indicatorDistribution,
   selectedCountry,
   onSelectCountry,
 }: {
   countryGrid: CountryGridItem[];
-  bottleneckProfiles: CountryBottleneckProfile[];
   indicatorDistribution: IndicatorDistribution[];
   selectedCountry: string | null;
   onSelectCountry: (country: string) => void;
@@ -65,14 +42,7 @@ export default function WorldMap({
     let min = Infinity;
     let max = -Infinity;
 
-    if (indicator === "bottleneck_type_count") {
-      bottleneckProfiles.forEach((p) => {
-        const count = countTypeFlags(p);
-        map.set(p.country, { value: count, displayValue: `${count}개 유형` });
-      });
-      min = 0;
-      max = 7;
-    } else if (indicator === "observed_gap_pct_point") {
+    if (indicator === "observed_gap_pct_point") {
       countryGrid.forEach((item) => {
         if (item.observed_gap_pct_point === null) return;
         map.set(item.country, {
@@ -94,7 +64,7 @@ export default function WorldMap({
     }
 
     return { valuesByCountry: map, domainMin: min, domainMax: max };
-  }, [indicator, countryGrid, bottleneckProfiles, indicatorDistribution]);
+  }, [indicator, countryGrid, indicatorDistribution]);
 
   const activeLabel = INDICATOR_OPTIONS.find((o) => o.value === indicator)?.label ?? "";
 
@@ -113,8 +83,8 @@ export default function WorldMap({
         <div>
           <h2 style={{ fontSize: 16, margin: "0 0 4px" }}>23개국 지도 탐색</h2>
           <p style={{ fontSize: 12, color: "var(--text-secondary)", margin: 0 }}>
-            국가를 클릭하면 오른쪽 패널에 상세 정보가 표시됩니다. 색은 상대적 크기를 나타낼 뿐, 좋고 나쁨을 뜻하지
-            않습니다.
+            국가 위에 커서를 올리면 오른쪽 패널에 상세 정보가 표시됩니다. 색은 상대적 크기를 나타낼 뿐, 좋고
+            나쁨을 뜻하지 않습니다.
           </p>
         </div>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -186,6 +156,7 @@ export default function WorldMap({
                         x: rect ? e.clientX - rect.left : 0,
                         y: rect ? e.clientY - rect.top : 0,
                       });
+                      onSelectCountry(country);
                     }}
                     onMouseLeave={() => setHovered(null)}
                     onClick={() => country && onSelectCountry(country)}
@@ -246,7 +217,7 @@ export default function WorldMap({
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 10, fontSize: 11, color: "var(--text-muted)", flexWrap: "wrap", gap: 8 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span>{activeLabel}</span>
-          <span className="tabular-nums">{domainMin.toFixed(indicator === "bottleneck_type_count" ? 0 : 1)}</span>
+          <span className="tabular-nums">{domainMin.toFixed(1)}</span>
           <div
             style={{
               width: 120,
@@ -256,7 +227,7 @@ export default function WorldMap({
               border: "1px solid var(--gridline)",
             }}
           />
-          <span className="tabular-nums">{domainMax.toFixed(indicator === "bottleneck_type_count" ? 0 : 1)}</span>
+          <span className="tabular-nums">{domainMax.toFixed(1)}</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <span style={{ width: 10, height: 10, borderRadius: 3, background: "#e7e5f2", display: "inline-block", border: "1px solid var(--gridline)" }} />

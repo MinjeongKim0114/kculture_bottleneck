@@ -8,15 +8,12 @@ import LoadingState from "@/components/LoadingState";
 import ErrorState from "@/components/ErrorState";
 import WorldMap from "@/components/map/WorldMap";
 import CountryDetailPanel from "@/components/map/CountryDetailPanel";
-import CountryGrid from "@/components/CountryGrid";
-import BottleneckSummary from "@/components/BottleneckSummary";
 
 export default function OverviewPage() {
   const [data, setData] = useState<OverviewResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
-  const [showFullList, setShowFullList] = useState(false);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -101,49 +98,11 @@ export default function OverviewPage() {
           >
             <WorldMap
               countryGrid={data.country_grid}
-              bottleneckProfiles={data.country_bottleneck_profiles}
               indicatorDistribution={data.indicator_distribution}
               selectedCountry={selectedCountry}
               onSelectCountry={setSelectedCountry}
             />
             <CountryDetailPanel country={selectedCountry} />
-          </div>
-
-          <div
-            style={{
-              height: 260,
-            }}
-            className="overview-summary-grid"
-          >
-            <BottleneckSummary data={data.bottleneck_type_summary} compact />
-          </div>
-
-          <div className="card" style={{ padding: "14px 20px" }}>
-            <button
-              onClick={() => setShowFullList((v) => !v)}
-              style={{
-                border: "none",
-                background: "none",
-                padding: 0,
-                fontSize: 13,
-                fontWeight: 600,
-                color: "var(--accent-primary)",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-              }}
-            >
-              {showFullList ? "▾" : "▸"} 23개국 전체 목록 보기 (표 형태)
-            </button>
-            {showFullList && (
-              <div style={{ marginTop: 16 }}>
-                <CountryGrid
-                  countryGrid={data.country_grid}
-                  bottleneckProfiles={data.country_bottleneck_profiles}
-                />
-              </div>
-            )}
           </div>
         </div>
       )}

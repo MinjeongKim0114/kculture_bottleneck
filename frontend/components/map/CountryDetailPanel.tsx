@@ -1,47 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ApiError, getCountryDetail } from "@/lib/api";
-import type { CountryBottleneckProfile, CountryDetailResponse } from "@/types/api";
-
-const FLAG_LABELS: { key: keyof CountryBottleneckProfile; label: string }[] = [
-  { key: "direct_gap_type_flag", label: "A 격차상위(전체)" },
-  { key: "conditional_gap_type_flag", label: "B 격차상위(경험자)" },
-  { key: "cognition_interest_barrier_flag", label: "C 인지/관심" },
-  { key: "image_barrier_flag", label: "D 이미지" },
-  { key: "economic_physical_access_barrier_flag", label: "E 경제/물리적 접근성" },
-  { key: "institutional_language_barrier_flag", label: "F 제도/언어" },
-  { key: "religious_cultural_env_barrier_flag", label: "G 종교/문화환경" },
-];
-
-// gap_tier 원본 문자열("Gap_큼(상위3분위)")은 통계적 정의를 그대로 서술한 것이라 일반 사용자에게
-// 직관적이지 않다는 피드백(BottleneckSummary와 동일한 이유)에 따라 화면 표시용으로만 순화한다.
-// 원본 값은 title 툴팁으로 그대로 남겨 정보 손실은 없다.
-const GAP_TIER_LABELS: Record<string, string> = {
-  "Gap_큼(상위3분위)": "격차 큰 편",
-  "Gap_중간(중위3분위)": "격차 보통",
-  "Gap_작음(하위3분위)": "격차 작은 편",
-};
-
-function GapTierBadge({ tier }: { tier: string }) {
-  return (
-    <span
-      title={tier}
-      style={{
-        fontSize: 12,
-        fontWeight: 500,
-        color: "var(--tone-gap-text)",
-        background: "var(--tone-gap-bg)",
-        borderRadius: 999,
-        padding: "4px 12px",
-        whiteSpace: "nowrap",
-        flexShrink: 0,
-      }}
-    >
-      {GAP_TIER_LABELS[tier] ?? tier}
-    </span>
-  );
-}
+import type { CountryDetailResponse } from "@/types/api";
+import { BOTTLENECK_FLAG_LABELS } from "@/lib/labels";
+import GapTierBadge from "@/components/GapTierBadge";
 
 function GapCard({ label, valuePct, tier }: { label: string; valuePct: number; tier: string }) {
   return (
@@ -59,7 +22,7 @@ function GapCard({ label, valuePct, tier }: { label: string; valuePct: number; t
     >
       <div>
         <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 4 }}>{label}</div>
-        <div className="tabular-nums" style={{ fontSize: 24, fontWeight: 500 }}>
+        <div className="tabular-nums" style={{ fontSize: 24, fontWeight: 500, color: "var(--tone-gap-text)" }}>
           {valuePct.toFixed(1)}%p
         </div>
       </div>
@@ -112,7 +75,7 @@ function Placeholder() {
     >
       <span style={{ fontSize: 28 }}>🗺️</span>
       <p style={{ fontSize: 13, margin: 0 }}>
-        지도에서 국가를 클릭하면
+        지도에서 국가 위에 커서를 올리면
         <br />
         해당 국가의 상세 정보가 여기에 표시됩니다.
       </p>
@@ -124,20 +87,34 @@ export default function CountryDetailPanel({ country }: { country: string | null
   const [detail, setDetail] = useState<CountryDetailResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const requestIdRef = useRef(0);
 
   useEffect(() => {
     if (!country) {
       setDetail(null);
       return;
     }
-    setLoading(true);
-    setError(null);
-    getCountryDetail(country)
-      .then(setDetail)
-      .catch((err: unknown) => {
-        setError(err instanceof ApiError ? err.message : "국가 정보를 불러오지 못했습니다.");
-      })
-      .finally(() => setLoading(false));
+    const requestId = ++requestIdRef.current;
+    // 지도 위에서 커서를 빠르게 옮기면 국가가 연달아 바뀔 수 있어, 짧게 디바운스하고
+    // 응답이 늦게 와도 그 사이 다른 국가로 바뀌었으면(stale) 반영하지 않는다.
+    const timer = setTimeout(() => {
+      setLoading(true);
+      setError(null);
+      getCountryDetail(country)
+        .then((res) => {
+          if (requestIdRef.current === requestId) setDetail(res);
+        })
+        .catch((err: unknown) => {
+          if (requestIdRef.current === requestId) {
+            setError(err instanceof ApiError ? err.message : "국가 정보를 불러오지 못했습니다.");
+          }
+        })
+        .finally(() => {
+          if (requestIdRef.current === requestId) setLoading(false);
+        });
+    }, 150);
+
+    return () => clearTimeout(timer);
   }, [country]);
 
   return (
@@ -166,7 +143,7 @@ export default function CountryDetailPanel({ country }: { country: string | null
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {detail.direct_gap && (
                 <GapCard
-                  label="문화경험률 대비 방한의향 격차"
+                  label="한류 경험 대비 방한 의향 격차"
                   valuePct={detail.direct_gap.observed_gap_pct_point}
                   tier={detail.direct_gap.gap_tier}
                 />
@@ -193,7 +170,7 @@ export default function CountryDetailPanel({ country }: { country: string | null
             className="detail-metric-grid"
           >
             <MetricCard
-              label="한류경험률"
+              label="한류 경험"
               value={detail.profile.culture_experience_rate_pct}
               tier={detail.pattern_profile.culture_experience_rate_pct_tier}
             />
@@ -229,7 +206,7 @@ export default function CountryDetailPanel({ country }: { country: string | null
             <div style={{ borderTop: "1px solid var(--gridline)", paddingTop: 12, marginTop: 16 }}>
               <h3 style={{ fontSize: 12, margin: "0 0 6px", color: "var(--text-muted)" }}>병목 프로파일</h3>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
-                {FLAG_LABELS.map(({ key, label }) => {
+                {BOTTLENECK_FLAG_LABELS.map(({ key, label }) => {
                   const isFlagged = detail.bottleneck_profile![key] === "Y";
                   return (
                     <span
