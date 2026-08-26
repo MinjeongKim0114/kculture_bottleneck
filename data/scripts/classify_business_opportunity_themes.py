@@ -27,6 +27,7 @@ from pathlib import Path
 
 import pandas as pd
 from openai import OpenAI
+import os
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 IN_CSV = REPO_ROOT / "data" / "processed" / "qualitative" / "reddit_candidates_for_review.csv"
@@ -86,11 +87,17 @@ SYSTEM_PROMPT = """당신은 사업 기회 발굴을 위한 리서치 보조입�
 
 
 def load_dotenv_key() -> str:
-    for line in BACKEND_ENV.read_text(encoding="utf-8").splitlines():
-        if line.startswith("LLM_API_KEY="):
-            return line.split("=", 1)[1].strip()
-    raise RuntimeError("LLM_API_KEY 없음")
+    value = os.environ.get("LLM_API_KEY")
 
+    if value:
+        return value
+
+    if BACKEND_ENV.exists():
+        for line in BACKEND_ENV.read_text(encoding="utf-8").splitlines():
+            if line.startswith("LLM_API_KEY="):
+                return line.split("=", 1)[1].strip()
+
+    raise RuntimeError("LLM_API_KEY 없음")
 
 def classify_batch(client: OpenAI, rows: list[dict]) -> dict[int, dict]:
     items = [

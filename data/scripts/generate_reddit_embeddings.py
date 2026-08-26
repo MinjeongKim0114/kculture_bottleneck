@@ -22,6 +22,7 @@ import psycopg
 from openai import OpenAI
 from pgvector.psycopg import register_vector
 from psycopg.rows import dict_row
+import os
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 BACKEND_ENV = REPO_ROOT / "backend" / ".env"
@@ -31,15 +32,22 @@ BATCH_SIZE = 100
 
 
 def load_env() -> tuple[str, str]:
-    db_url = None
-    api_key = None
-    for line in BACKEND_ENV.read_text(encoding="utf-8").splitlines():
-        if line.startswith("DATABASE_URL="):
-            db_url = line.split("=", 1)[1].strip()
-        elif line.startswith("LLM_API_KEY="):
-            api_key = line.split("=", 1)[1].strip()
+    db_url = os.environ.get("DATABASE_URL")
+    api_key = os.environ.get("LLM_API_KEY")
+
+    if db_url and api_key:
+        return db_url, api_key
+
+    if BACKEND_ENV.exists():
+        for line in BACKEND_ENV.read_text(encoding="utf-8").splitlines():
+            if line.startswith("DATABASE_URL="):
+                db_url = line.split("=", 1)[1].strip()
+            elif line.startswith("LLM_API_KEY="):
+                api_key = line.split("=", 1)[1].strip()
+
     if not db_url or not api_key:
         raise RuntimeError("DATABASE_URL 또는 LLM_API_KEY 없음")
+
     return db_url, api_key
 
 

@@ -21,6 +21,7 @@ from pathlib import Path
 
 import pandas as pd
 from openai import OpenAI
+import os
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 IN_CSV = REPO_ROOT / "data" / "processed" / "qualitative" / "reddit_candidates.csv"
@@ -49,12 +50,17 @@ SYSTEM_PROMPT = """당신은 리서치 보조입니다. 아래 각 Reddit 게시
 
 
 def load_dotenv_key() -> str:
+    value = os.environ.get("LLM_API_KEY")
+
+    if value:
+        return value
+
     if BACKEND_ENV.exists():
         for line in BACKEND_ENV.read_text(encoding="utf-8").splitlines():
             if line.startswith("LLM_API_KEY="):
                 return line.split("=", 1)[1].strip()
-    raise RuntimeError("backend/.env 에서 LLM_API_KEY를 찾지 못함")
 
+    raise RuntimeError("LLM_API_KEY 없음")
 
 def dedupe(df: pd.DataFrame) -> pd.DataFrame:
     """같은 post_id가 여러 (barrier_category, query, subreddit) 조합에서 잡힌 경우,
