@@ -34,7 +34,7 @@ OUT_CSV = REPO_ROOT / "data" / "processed" / "qualitative" / "reddit_candidates_
 BACKEND_ENV = REPO_ROOT / "backend" / ".env"
 
 BATCH_SIZE = 8
-MODEL = "gpt-4o-mini"
+MODEL = "gpt-5.6-terra"
 
 SYSTEM_PROMPT = """당신은 사업 기회 발굴을 위한 리서치 보조입니다. 목표는 "관광 장벽과
 정확히 매칭되는가"가 아니라 "이 글이 한국 관련 신사업 기획에 참고할 만한 실제 페인포인트/
@@ -60,9 +60,24 @@ SYSTEM_PROMPT = """당신은 사업 기회 발굴을 위한 리서치 보조입�
    중 우연히 대학교를 지나간 얘기라면 잠재방문객일 수 있음). 글 전체 맥락에서 화자가
    실제로 무엇을 하려는지/했는지를 읽고 판단하세요.
 
+   중요 — 화자 본인 vs 글 속에 언급된 제3자를 혼동하지 마세요: "이미 여행했거나 현재
+   살고 있는 분들께 묻습니다" 같은 문장은 화자가 아니라 "답변해줄 대상(청자)"을
+   가리키는 경우가 많습니다. population_type은 오직 **화자 본인**의 체류 목적·의도만
+   근거로 판단하세요. 글에 "거주자"라는 단어가 보인다고 해서 자동으로 "둘다해당(구조적)"
+   이나 "체류거주외국인"으로 분류하지 마세요 — 화자 본인이 실제로 거주자/유학생인지
+   먼저 확인한 뒤, 그 문제가 단기 방문객에게도 똑같이 적용되는 구조적 문제일 때만
+   "둘다해당(구조적)"입니다.
+
 2. business_theme: 이 글에서 읽히는 사업 기회 주제를 한국어 짧은 명사구로 (예:
    "외국인 대상 핀테크/결제", "할랄푸드 정보 큐레이션", "의료 통역 서비스", "관광 비자
    컨설팅", "외국인 대상 통신(SIM)" 등). 사업 기회로 연결할 거리가 전혀 없으면 빈 문자열.
+
+   다음 두 경우는 business_theme을 비워두세요:
+   - 단순 과거 회고/추억담일 뿐, 지금도 유효한 실제 니즈나 불편이 아닌 경우 (예: "예전에
+     이 동네 살았는데 그때는 이랬다"는 회상 — 현재 사업 기회로 연결할 근거가 아님)
+   - 한국이 글의 핵심이 아니라 배경으로 스쳐 지나가듯 언급될 뿐인 경우 (예: 화자가
+     이미 한국을 떠나 다른 나라에 살며 그 나라 관련 팁을 묻는데 한국은 "예전에 살았던
+     곳"으로만 언급되는 경우 — 한국 관련 니즈/불편이 글의 실제 주제가 아님)
 
 반드시 JSON으로만 응답: {"results": [{"index": 0, "population_type": "...",
 "business_theme": "...", "reason": "한 문장(화자의 목적/의도를 근거로 설명)"}, ...]}
@@ -86,7 +101,7 @@ def classify_batch(client: OpenAI, rows: list[dict]) -> dict[int, dict]:
         for i, r in enumerate(rows)
     ]
     resp = client.chat.completions.create(
-        model=MODEL, temperature=0, response_format={"type": "json_object"},
+        model=MODEL, response_format={"type": "json_object"},
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": json.dumps({"items": items}, ensure_ascii=False)},

@@ -6,6 +6,8 @@
 --
 -- 사용법: Supabase 대시보드 > SQL Editor 에 전체를 붙여넣고 실행한다.
 
+create extension if not exists vector;
+
 -- =====================================================================
 -- 1. country_profile_base (23행, A급) — 국가별 기본 프로필
 -- =====================================================================
@@ -261,9 +263,15 @@ create table if not exists reddit_qualitative_evidence (
     ai_relevance_reason              text,
     population_type                  text,
     business_theme                   text,
-    business_theme_reason            text
+    business_theme_reason            text,
+    embedding                        vector(1536)
 );
 alter table reddit_qualitative_evidence enable row level security;
+
+-- 챗봇이 질문 임베딩과의 코사인 유사도로 관련 게시물을 그때그때 찾아오기 위한 인덱스.
+-- title+business_theme_reason 기준으로 생성(data/scripts/generate_reddit_embeddings.py 참고).
+create index if not exists reddit_qualitative_evidence_embedding_idx
+    on reddit_qualitative_evidence using hnsw (embedding vector_cosine_ops);
 
 -- =====================================================================
 -- 15. potential_tourist_2025_survey (39,667행, C급) — 2025 잠재방한여행객조사

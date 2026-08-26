@@ -18,7 +18,7 @@ load_dotenv(BACKEND_DIR / ".env")
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 LLM_API_KEY = os.environ.get("LLM_API_KEY")
-LLM_MODEL = os.environ.get("LLM_MODEL", "gpt-4o")
+LLM_MODEL = os.environ.get("LLM_MODEL", "gpt-5.6-terra")
 
 
 class CsvFiles:

@@ -10,29 +10,14 @@ import json
 
 import psycopg
 from openai import OpenAI
+from pgvector.psycopg import register_vector
 from psycopg.rows import dict_row
 
 from app.core.config import DATABASE_URL, LLM_API_KEY, LLM_MODEL
 from app.data_access.repository import DataRepository
 
-# reddit_qualitative_evidence.business_theme은 AI가 자유 텍스트로 붙인 라벨이라
-# 표현이 제각각이다. data/scripts/build_business_opportunity_report.py와 동일한
-# 클러스터 정의를 재사용해서 상시 컨텍스트로 넣을 6개 테마를 묶는다.
-THEME_CLUSTERS = {
-    "여행 정보/일정 큐레이션": [
-        "여행 정보 제공", "여행 정보 공유", "관광 정보 제공", "여행 일정 계획 서비스",
-        "여행 계획 서비스", "여행 계획 컨설팅", "여행 일정 조정 서비스", "여행 경험 공유",
-        "가족 여행 정보 제공", "한국 여행 정보 제공", "여행 일정 추천 서비스",
-    ],
-    "비자/이주 컨설팅": [
-        "비자 상담 서비스", "비자 신청 지원 서비스", "관광 비자 컨설팅", "이주 컨설팅",
-        "관광 비자 정보", "비자 컨설팅",
-    ],
-    "유학 컨설팅": ["유학 상담 서비스", "유학 컨설팅"],
-    "할랄푸드 정보/큐레이션": ["할랄푸드 정보 큐레이션", "할랄 음식 정보"],
-    "외국인 대상 통신(SIM/디지털 인프라)": ["외국인 대상 통신(SIM)"],
-    "의료/헬스케어 통역·안내": ["의료 통역 서비스", "의료 관광"],
-}
+EMBEDDING_MODEL = "text-embedding-3-small"
+QUALITATIVE_TOP_K = 12
 
 # 표마다 국가명 표기가 다른 경우가 있다(확인된 것: 23개국 표는 "UAE", 2025 설문은
 # "아랍에미리트"). 어느 쪽 이름으로 조회하든 같은 별칭 그룹을 찾을 수 있도록 양방향으로 검사한다.
@@ -94,6 +79,9 @@ SYSTEM_PROMPT = """당신은 '한류 인지-행동 Gap' 분석 대시보드의 A
       설문과는 다른 모집단이며, 통계적 대표성이 없습니다. "몇 건"이라는
       숫자를 %처럼 쓰지 말고, "이런 사례/목소리가 관찰된다" 정도로만
       서술하세요.
+    - 여기 나온 사례는 전체 표본이 아니라, 이번 질문과 의미적으로 가까운
+      상위 몇 건만 검색해 보여준 것입니다. "이런 사례들만 있다"거나
+      "가장 흔한 사례다"처럼 전체를 대표하는 것처럼 말하지 마세요.
     - population_type이 아직 사람이 최종 검토하지 않은 AI 1차 판정임을
       인지하고, 단정적으로 서술하지 마세요("~일 수 있다", "~라는 사례가
       있다" 톤 유지).
@@ -150,44 +138,41 @@ class ChatService:
         }
         return json.dumps(data, ensure_ascii=False)
 
-    def _fetch_reddit_evidence(self) -> list[dict]:
+    def _embed(self, text: str) -> list[float]:
+        resp = self._client.embeddings.create(model=EMBEDDING_MODEL, input=[text])
+        return resp.data[0].embedding
+
+    def _fetch_reddit_evidence(self, question: str) -> list[dict]:
+        query_embedding = self._embed(question)
         with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn:
+            register_vector(conn)
             with conn.cursor() as cur:
                 cur.execute(
                     "SELECT population_type, business_theme, business_theme_reason, "
                     "title, permalink FROM reddit_qualitative_evidence "
-                    "WHERE population_type != '무관'"
+                    "WHERE population_type != '무관' AND embedding IS NOT NULL "
+                    "ORDER BY embedding <=> %s::vector LIMIT %s",
+                    (query_embedding, QUALITATIVE_TOP_K),
                 )
                 return cur.fetchall()
 
-    def _build_qualitative_context(self, examples_per_cluster: int = 3) -> str:
-        rows = self._fetch_reddit_evidence()
-        theme_to_cluster = {
-            theme: cluster for cluster, themes in THEME_CLUSTERS.items() for theme in themes
-        }
-        clustered: dict[str, list[dict]] = {c: [] for c in THEME_CLUSTERS}
-        for r in rows:
-            cluster = theme_to_cluster.get(r.get("business_theme"))
-            if cluster:
-                clustered[cluster].append(r)
+    def _build_qualitative_context(self, question: str) -> str:
+        rows = self._fetch_reddit_evidence(question)
+        if not rows:
+            return ""
 
         lines = [
             "[정성적 참고자료 — Reddit, 규칙 12번 준수해서 사용]",
-            "출처: 체류/방문 외국인이 Reddit에 남긴 글(942건 중 population_type이 "
-            "'무관'이 아닌 것만). 관계, 대표성, 사용 규칙은 시스템 규칙 12번 참고.",
+            "출처: 체류/방문 외국인이 Reddit에 남긴 글 중, 이 질문과 의미적으로 "
+            "가장 가까운 상위 사례만 검색해 보여줌(population_type이 '무관'인 것은 제외). "
+            "관계, 대표성, 사용 규칙은 시스템 규칙 12번 참고.",
         ]
-        for cluster, cluster_rows in clustered.items():
-            if not cluster_rows:
-                continue
-            pop_counts: dict[str, int] = {}
-            for r in cluster_rows:
-                pop_counts[r["population_type"]] = pop_counts.get(r["population_type"], 0) + 1
-            lines.append(f"\n## {cluster} ({len(cluster_rows)}건, {pop_counts})")
-            for r in cluster_rows[:examples_per_cluster]:
-                lines.append(
-                    f"- [{r['population_type']}] \"{r['title']}\" — "
-                    f"{r.get('business_theme_reason', '')} (출처: {r['permalink']})"
-                )
+        for r in rows:
+            theme = r.get("business_theme") or "(사업 테마 미분류)"
+            lines.append(
+                f"- [{r['population_type']} / {theme}] \"{r['title']}\" — "
+                f"{r.get('business_theme_reason', '')} (출처: {r['permalink']})"
+            )
         return "\n".join(lines)
 
     def _build_content_reasons_context(self, question: str) -> str:
@@ -300,13 +285,12 @@ class ChatService:
         extra = "\n\n".join(b for b in blocks if b)
         content = (
             f"[데이터]\n{self._build_context()}\n\n"
-            f"{self._build_qualitative_context()}\n\n"
+            f"{self._build_qualitative_context(question)}\n\n"
             + (f"{extra}\n\n" if extra else "")
             + f"[질문]\n{question}"
         )
         response = self._client.chat.completions.create(
             model=LLM_MODEL,
-            temperature=0,
             seed=42,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},

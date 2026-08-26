@@ -1,6 +1,6 @@
 # 1. 프로젝트 소개
 
-**한류 인지-행동 Gap 분석 서비스(Cognitive-Behavioral Gap Analysis Service)**는 해외 23개국의 한류/한국 문화 경험·호감도와 실제 방한 의향·행동 사이에 존재하는 "인지-행동 Gap"을 데이터로 측정하고, 그 Gap이 어떤 장벽 때문에 발생하는지 탐색할 수 있는 대시보드 + AI 챗봇 서비스입니다.
+**외국인 방한 수요-장벽 갭 기반 사업 기회 발굴 서비스**는 해외 23개국의 한류/한국 문화 경험·호감도와 실제 방한 의향·행동 사이에 존재하는 "인지-행동 Gap"을 데이터로 측정하고, 그 Gap이 어떤 장벽 때문에 발생하는지 탐색해 신사업 기회로 연결하는 대시보드 + AI 챗봇 서비스입니다.
 
 원본 데이터는 2026년 해외한류실태조사 통계 PDF(1,866페이지)이며, 이 안에 흩어진 국가별 원수치를 OCR로 추출·검증해 분석 가능한 형태로 만들었습니다.
 
@@ -60,9 +60,8 @@
 ## 이번 MVP에서 제외한 기능
 
 - 로그인/인증
-- 정성 데이터(Reddit 등) 기반 RAG, pgvector 임베딩 검색
 - n8n ETL 자동화 파이프라인
-- 연령/소득 등 세그먼트별 분석
+- 성별/연령별/거주국별 세그먼트 집계 분석 (원본 세그먼트 데이터는 적재됐으나 집계/대시보드는 없음)
 - 프론트엔드 챗봇 UI (현재는 백엔드 API까지만 구현)
 
 ## MVP 원칙
@@ -86,8 +85,8 @@
 
 ```
 자연어 질문 → POST /api/chat
-           → Supabase의 정량 데이터(23개국 x 10개 표)를 컨텍스트로 주입
-           → GPT-4o가 데이터 안에서만 답변 생성
+           → Supabase의 정량 데이터를 컨텍스트로 주입
+           → OpenAI gpt-5.6-terra가 데이터 안에서만 답변 생성
            → 근거 있는 답변 반환 (없는 데이터는 "답변할 수 없다"고 응답)
 ```
 
@@ -147,11 +146,12 @@ Direct Gap과 Conditional Gap을 서로 다른 축으로 분리해서 비교하�
 
 ## AI
 
-- OpenAI API (GPT-4o) — 정량 데이터 기반 챗봇 응답 생성
+- OpenAI API (gpt-5.6-terra) — 정량 데이터 기반 챗봇 응답 생성
+- pgvector — Reddit 정성 데이터(942건) 임베딩 검색 (text-embedding-3-small). 질문마다
+  의미적으로 가까운 사례를 top-K로 찾아 챗봇 컨텍스트에 주입 (2026-08-26 추가)
 
 ## 계획되어 있으나 아직 미구현
 
-- pgvector, RAG (정성 데이터 임베딩 검색)
 - n8n (ETL 자동화)
 
 ---
@@ -165,7 +165,7 @@ Direct Gap과 Conditional Gap을 서로 다른 축으로 분리해서 비교하�
 [검증된 CSV, data/processed/]
        │  Table Editor CSV Import
        ▼
-[Supabase (PostgreSQL), 12개 테이블]
+[Supabase (PostgreSQL), 15개 테이블]
        │  psycopg
        ▼
 [FastAPI, DataRepository 추상화]
@@ -177,7 +177,7 @@ Direct Gap과 Conditional Gap을 서로 다른 축으로 분리해서 비교하�
    └─ POST /api/chat
            │  정량 데이터를 컨텍스트로 주입
            ▼
-      [OpenAI GPT-4o]
+      [OpenAI gpt-5.6-terra]
 ```
 
 `DataRepository`는 추상 인터페이스로 정의되어 있어(`backend/app/data_access/repository.py`), CSV 기반 구현(`CsvDataRepository`)과 PostgreSQL 기반 구현(`PostgresDataRepository`)을 서비스/API 계층 변경 없이 교체할 수 있습니다.
@@ -204,6 +204,11 @@ country_profile_base (PK: country)  ──┬── gap_analysis (PK/FK: country
 
 원천 롱포맷 (모든 상위 표의 계산 원천):
   analysis_long (surrogate PK)
+
+국가 범위가 다른 독립 테이블 (23개국 고정 목록과 조인 시 국가 목록 불일치 주의):
+  content_liking_disliking_reasons (한류실태조사 30개국)
+  potential_tourist_2025_survey (2025 잠재방한여행객조사 26개국, 세그먼트 롱포맷)
+  reddit_qualitative_evidence (국가 무관, private DB — public 레포에는 원본 미포함)
 ```
 
 ---
@@ -399,6 +404,48 @@ PDF 표 추출 작업을 여러 백그라운드 에이전트에게 순서대로 
 
 발견 즉시 중복 프로세스를 모두 종료하고, 하나의 프로세스만 남긴 것을 확인한 뒤 진행했습니다. 스크립트가 모든 국가 처리를 끝낸 뒤에만 결과 파일을 쓰는 구조였기 때문에 중간 데이터 손실은 없었습니다.
 
+## 12.6 AI 라벨링(population_type/business_theme) 오류 — 표본 검증으로 발견
+
+#### 현상
+
+Reddit 정성 데이터에 AI(gpt-4o-mini)가 1차로 붙인 population_type(잠재방문객/체류거주외국인 등)을 16건 표본으로 직접 대조했더니, 4건(25%)이 잘못 분류돼 있었습니다.
+
+#### 원인
+
+두 가지 패턴이 반복됐습니다. (1) "이미 여행했거나 살고 있는 분들께 묻습니다" 같은 문장에서, AI가 화자 본인의 상태가 아니라 글 속에 언급된 제3자(답변해줄 대상)를 화자 상태로 착각. (2) 과거 회고담이나 한국이 배경으로만 스친 글에도 business_theme을 붙임.
+
+#### 해결
+
+분류 프롬프트에 "화자 본인 vs 글 속 제3자 구분", "과거 회고/한국이 배경일 뿐인 글은 테마 비움" 두 지시를 추가하고 942건 전체를 재분류했습니다. 검증했던 4건 중 2건은 정확히 고쳐졌지만, "화자 본인 상태가 애매한 짧은 글"은 재분류 후에도 일부 남아있어 — 이 문서(`business_opportunity_themes.md`)에 인용 시 주의 문구를 남겨뒀습니다. 100% 정확한 AI 라벨링은 기대하기 어렵고, 표본 검증 → 프롬프트 수정 → 재실행 → 재검증 루프가 실질적인 개선 수단이었습니다.
+
+## 12.7 reasoning 모델(gpt-5.6 계열)로 전환 시 `temperature` 미지원
+
+#### 현상
+
+챗봇/분류 스크립트 모델을 gpt-4o(-mini)에서 gpt-5.6-terra로 바꾸자 `temperature=0` 파라미터에서 `BadRequestError`가 발생했습니다.
+
+#### 원인
+
+reasoning 모델은 Chat Completions API에서 `temperature`를 커스텀 값으로 지원하지 않고 기본값(1)만 허용합니다(OpenAI 공식 문서 기준, Responses API 사용을 권장하지만 Chat Completions도 계속 지원됨).
+
+#### 해결
+
+`temperature=0` 파라미터를 제거했습니다(`seed=42`는 그대로 지원됨). 결정성은 프롬프트 내 "계산은 인용만, 사전 계산된 값만 사용" 원칙(12.4 참고)과 seed에 의존하는 구조로 유지됩니다.
+
+## 12.8 pgvector 유사도 검색에서 파라미터 타입 캐스팅 누락
+
+#### 현상
+
+`chat_service.py`에서 질문 임베딩으로 `ORDER BY embedding <=> %s LIMIT %s` 쿼리를 실행하니 `operator does not exist: vector <=> double precision[]` 에러가 발생했습니다.
+
+#### 원인
+
+`pgvector.psycopg.register_vector`는 컬럼에 저장(`UPDATE ... SET embedding = %s`)할 때는 대상 컬럼 타입을 알 수 있어 자동 변환되지만, `ORDER BY` 같은 위치에서 파라미터로 바로 비교할 때는 psycopg가 Python list를 어떤 타입으로 보낼지 추론하지 못합니다.
+
+#### 해결
+
+쿼리에서 `%s::vector`로 명시적으로 캐스팅했습니다. 이후 정상 동작을 확인했습니다.
+
 ---
 
 # 13. 회고
@@ -425,9 +472,12 @@ PDF 표 추출 작업을 여러 백그라운드 에이전트에게 순서대로 
 
 # 14. 향후 개선 방향
 
-- Reddit 등 정성 데이터 크롤링 → RAG 파이프라인(pgvector) 구축 — 지금은 "무엇이 장벽인지"의 %만 있고 "왜 그런지"에 대한 정성적 근거가 없음
-- 표 1-17(호감요인)/1-18(호감 저해요인)/1-37(한류 부정적 인식 공감 이유) 추출·반영 — "왜"를 설명하는 정량 데이터 보강 (진행 중)
 - 프론트엔드 챗봇 UI 추가 (현재는 백엔드 API까지만 구현)
 - LLM 응답의 사실 일치 여부를 자동으로 확인하는 후처리 검증 단계 추가
-- n8n 기반 ETL 자동화
-- 2025 잠재방한여행객조사 결합 및 세그먼트별(연령/소득 등) 분석
+- n8n 기반 ETL 자동화 — 2026-08-26 검토 결과, Reddit 라벨링 로직이 아직 계속 수정되고
+  있어 파이프라인이 안정된 뒤로 보류. 단순 스케줄 실행이 아니라 수집→분류→사람 검토→
+  DB반영을 잇는 다단계 워크플로가 목적이라, 로직이 안정된 뒤 이메일 알림(검토 대기 알림)과
+  함께 도입 검토
+- 세그먼트별(성별/연령별/거주국별) 분석 — 2025 잠재방한여행객조사 데이터 자체는 이미
+  결합·적재 완료됐고 챗봇이 개별 질문에 인용 가능하지만, 국가별 세그먼트 Gap을 비교하는
+  집계 분석/대시보드는 아직 없음. 구체적인 비교 질문이 생기면 그때 착수 권장
