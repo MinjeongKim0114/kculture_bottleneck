@@ -7,6 +7,7 @@ FastAPI가 서브프로세스로 실행하고 결과 요약만 n8n에 HTTP로 �
 비밀 토큰(X-Internal-Token)으로 게이트한다.
 """
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -47,6 +48,9 @@ def run_reddit_pipeline(x_internal_token: str | None = Header(default=None)) -> 
 
     logs: dict[str, dict] = {}
     for script in PIPELINE_SCRIPTS:
+        # Windows에서 자식 프로세스 stdout이 파이프로 연결되면 콘솔이 아니므로
+        # 기본 로케일 코드페이지(cp949)로 인코딩됨 - PYTHONIOENCODING을 강제해서
+        # UTF-8로 통일한다. 안 하면 로그의 한글이 깨져서 나온다(실제 동작엔 무해).
         result = subprocess.run(
             [sys.executable, str(SCRIPTS_DIR / script)],
             cwd=REPO_ROOT,
@@ -55,6 +59,7 @@ def run_reddit_pipeline(x_internal_token: str | None = Header(default=None)) -> 
             encoding="utf-8",
             errors="replace",
             timeout=STEP_TIMEOUT_SEC,
+            env={**os.environ, "PYTHONIOENCODING": "utf-8"},
         )
         logs[script] = {
             "returncode": result.returncode,
