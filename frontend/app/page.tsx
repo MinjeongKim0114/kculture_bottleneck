@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { ApiError, getOverview } from "@/lib/api";
 import type { OverviewResponse } from "@/types/api";
 import LoadingState from "@/components/LoadingState";
@@ -44,25 +45,44 @@ export default function OverviewPage() {
         minHeight: "100vh",
       }}
     >
-      <header style={{ marginBottom: 16 }}>
-        <p
+      <header style={{ marginBottom: 16, display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16 }}>
+        <div>
+          <p
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: "0.06em",
+              color: "var(--accent-primary)",
+              margin: "0 0 6px",
+              textTransform: "uppercase",
+            }}
+          >
+            Overview
+          </p>
+          <h1 style={{ fontSize: 22, margin: "0 0 6px" }}>
+            한류 경험 · 인식 · 방한의향 — 23개국 관찰 패턴 탐색
+          </h1>
+          <p style={{ fontSize: 12.5, color: "var(--text-secondary)", margin: 0, maxWidth: 820 }}>
+            지도에서 국가를 선택해 문화 경험·인식·방한의향 사이에 관찰되는 패턴을 탐색하세요.
+          </p>
+        </div>
+        <Link
+          href="/chat"
           style={{
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: "0.06em",
-            color: "var(--accent-primary)",
-            margin: "0 0 6px",
-            textTransform: "uppercase",
+            flexShrink: 0,
+            border: "none",
+            borderRadius: 999,
+            background: "var(--accent-primary)",
+            color: "#fff",
+            padding: "10px 18px",
+            fontSize: 13,
+            fontWeight: 600,
+            textDecoration: "none",
+            whiteSpace: "nowrap",
           }}
         >
-          Overview
-        </p>
-        <h1 style={{ fontSize: 22, margin: "0 0 6px" }}>
-          한류 경험 · 인식 · 방한의향 — 23개국 관찰 패턴 탐색
-        </h1>
-        <p style={{ fontSize: 12.5, color: "var(--text-secondary)", margin: 0, maxWidth: 820 }}>
-          지도에서 국가를 선택해 문화 경험·인식·방한의향 사이에 관찰되는 패턴을 탐색하세요.
-        </p>
+          AI Analyst에게 물어보기
+        </Link>
       </header>
 
       {loading && <LoadingState />}

@@ -2,6 +2,14 @@ import type { BottleneckTypeSummary } from "@/types/api";
 
 const MAX_COUNT = 23;
 
+// Type A/B의 원본 라벨("Direct/Conditional Gap 상위3분위")은 통계적 정의를 그대로 서술한 것이라
+// C~G의 장벽 이름과 톤이 달라 직관적이지 않다는 피드백에 따라 화면 표시용으로만 순화한다.
+// 원본 정의는 criterion 텍스트(비압축 모드)에 그대로 남아 있어 정보 손실은 없다.
+const DISPLAY_LABEL_OVERRIDES: Record<string, string> = {
+  "Type A": "격차 상위국 (전체 응답자 기준)",
+  "Type B": "격차 상위국 (문화경험자 기준)",
+};
+
 export default function BottleneckSummary({
   data,
   compact = false,
@@ -39,7 +47,7 @@ export default function BottleneckSummary({
               >
                 <span style={{ fontWeight: 600 }}>
                   {type.type_code}
-                  {!compact && ` · ${type.type_label}`}
+                  {` · ${DISPLAY_LABEL_OVERRIDES[type.type_code] ?? type.type_label}`}
                   {type.overly_broad_flag === "Y" && (
                     <span
                       style={{

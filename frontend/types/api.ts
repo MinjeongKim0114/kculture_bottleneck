@@ -140,3 +140,7 @@ export interface CountryDetailResponse {
   top_barriers: TopBarrier[];
   bottleneck_profile: CountryBottleneckProfile | null;
 }
+
+export interface ChatResponse {
+  answer: string;
+}
