@@ -290,7 +290,7 @@ class ChatService:
             f"{json.dumps(rows, ensure_ascii=False)}"
         )
 
-    def ask(self, question: str) -> str:
+    def ask(self, question: str, history: list[dict] | None = None) -> str:
         # analysis_long은 다른 표들의 원천 롱포맷이라 내용이 중복이고, 국가당 최대
         # 수백 행이라 상시 주입하면 컨텍스트 한도를 넘긴다(dashboard_data_dictionary.md
         # 12절 설계 의도대로 "출처 확인용"으로만 남겨두고 기본 주입에서는 제외한다).
@@ -306,12 +306,15 @@ class ChatService:
             + (f"{extra}\n\n" if extra else "")
             + f"[질문]\n{question}"
         )
+        # history는 같은 대화창 내 이전 질문/답변 turn만 담고 있다(호출자인
+        # chat.py가 새 대화창마다 빈 리스트로 초기화). 여기 그대로 이어붙이면
+        # 국가 등 앞선 turn에서 지정한 맥락을 모델이 계속 참고할 수 있다.
+        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+        messages.extend(history or [])
+        messages.append({"role": "user", "content": content})
         response = self._client.chat.completions.create(
             model=LLM_MODEL,
             seed=42,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": content},
-            ],
+            messages=messages,
         )
         return response.choices[0].message.content

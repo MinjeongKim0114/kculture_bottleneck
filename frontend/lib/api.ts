@@ -39,13 +39,21 @@ export function getCountryDetail(country: string): Promise<CountryDetailResponse
   return getJson<CountryDetailResponse>(`/api/countries/${encodeURIComponent(country)}`);
 }
 
-export async function postChat(question: string): Promise<ChatResponse> {
+export interface ChatHistoryMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export async function postChat(
+  question: string,
+  history: ChatHistoryMessage[] = [],
+): Promise<ChatResponse> {
   let response: Response;
   try {
     response = await fetch(`${API_BASE_URL}/api/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({ question, history }),
     });
   } catch {
     throw new ApiError(
