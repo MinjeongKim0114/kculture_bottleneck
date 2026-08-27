@@ -143,4 +143,5 @@ export interface CountryDetailResponse {
 
 export interface ChatResponse {
   answer: string;
+  follow_up_questions: string[];
 }

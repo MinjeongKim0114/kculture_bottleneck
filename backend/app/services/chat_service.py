@@ -7,6 +7,7 @@ opportunity framing. The LLM narrates/explains these; it never invents or
 recomputes a statistic, and never treats Reddit counts as survey percentages.
 """
 import json
+import re
 
 import psycopg
 from openai import OpenAI
@@ -22,6 +23,21 @@ QUALITATIVE_TOP_K = 12
 # 표마다 국가명 표기가 다른 경우가 있다(확인된 것: 23개국 표는 "UAE", 2025 설문은
 # "아랍에미리트"). 어느 쪽 이름으로 조회하든 같은 별칭 그룹을 찾을 수 있도록 양방향으로 검사한다.
 COUNTRY_ALIAS_GROUPS = [["UAE", "아랍에미리트"]]
+
+
+# gap_barrier_correlation.pair / sensitivity_analysis.pair 값에는
+# "Direct_Gap(E1A-1-B5B-1) vs 한류_관심_부재"처럼 설문 문항 코드가 괄호로
+# 박혀 있다. 이건 JSON 키가 아니라 데이터 값 자체라 규칙 0(키/컬럼명 노출
+# 금지)이 커버하지 못했고, 실제로 모델이 이 코드를 그대로 답변에 인용하는
+# 사고가 있었다 - 사람이 읽는 이름(Direct_Gap 등)만 남기고 코드는 지운다.
+_INDICATOR_CODE_RE = re.compile(r"\([A-Za-z0-9-]+\)")
+
+
+def _strip_indicator_codes(rows: list[dict]) -> list[dict]:
+    return [
+        {**row, "pair": _INDICATOR_CODE_RE.sub("", row["pair"]).strip()} if "pair" in row else row
+        for row in rows
+    ]
 
 
 def _country_search_terms(country: str) -> list[str]:
@@ -46,8 +62,23 @@ SYSTEM_PROMPT = """당신은 '한류 인지-행동 Gap' 분석 대시보드의 A
    통계 전문 용어나 "n=73"처럼 기호로 줄여 쓰는 표기는 피하고, "최저~최고
    범위", "중간값", "73명 응답 기준"처럼 쉬운 말로 풀어서 설명하세요.
    다만 정확한 숫자·퍼센트·표본 크기 자체는 그대로 인용해야 합니다(규칙 1, 4).
+   이 원칙은 JSON 키뿐 아니라 값 안에 섞여 있는 설문 문항 코드에도
+   동일하게 적용됩니다 — 예를 들어 "E1A-1", "B5B-1"처럼 영문자+숫자+
+   하이픈으로 된 내부 식별자를 값에서 보게 되더라도 그 코드 자체를
+   답변에 옮기지 마세요. 그 코드가 붙어있는 지표의 사람이 읽는 이름
+   (예: "Direct Gap")만 언급하고, 코드는 완전히 무시하세요.
 1. [데이터]에 없는 수치나 국가를 지어내지 마세요. 데이터로 답할 수 없으면
    "현재 데이터로는 답변할 수 없습니다"라고 솔직히 말하세요.
+   **이 규칙은 아래 2번(각주형 데이터 블록)에서 설명하는 데이터 종류 -
+   [콘텐츠 호감/비호감 이유], [국가별 관찰 로그], [2025 잠재방한여행객조사]
+   등 - 에도 똑같이 적용됩니다.** 이런 블록들은 질문에 해당 국가가 매칭될
+   때만 이번 메시지에 실제로 첨부됩니다. 이번 메시지에 그 블록이 보이지
+   않으면, 그 조사/자료 자체가 이번 국가에 대해 존재하지 않는 것입니다.
+   이럴 때는 "OO 조사에는 없지만"처럼 이름만이라도 절대 지어내 언급하지
+   말고, 그냥 "현재 데이터로는 답변할 수 없습니다"라고만 말하세요. 대화
+   앞부분(다른 국가 질문)에서 그런 이름의 데이터가 실제로 등장했더라도,
+   이번 국가 질문에 그 블록이 다시 첨부되지 않았다면 그 국가에는 그
+   데이터가 없는 것이니 재사용하거나 흉내 내지 마세요.
 2. 모든 퍼센트 값은 국가 단위 응답 비율이며, 개인 단위 확률이 아닙니다.
 3. 각 지표에 함께 제공되는 "상위/중위/하위 3분위" 같은 상대적 위치 값은
    23개국 사이의 상대적 위치이며 절대적 기준이 아닙니다. 이 표현을 그대로
@@ -129,6 +160,29 @@ SYSTEM_PROMPT = """당신은 '한류 인지-행동 Gap' 분석 대시보드의 A
     용도로만 쓰고, 여기서 새로운 값을 계산하거나 다른 데이터와 다른 숫자가
     나오면 그 데이터 값을 우선하세요(가공되지 않은 원천이라 반올림 등의
     차이가 있을 수 있음).
+17. 답변(answer) 본문이 여러 단락으로 나뉘는 긴 내용이면(예: 국가별로 여러
+    장벽을 각각 설명, 여러 지표를 순서대로 짚는 경우), 각 덩어리 앞에
+    소제목을 붙여서 구조화하세요:
+    - 큰 구분에는 "## 소제목" (예: "## 언어 장벽", "## 실행 방향")
+    - 그 안에서 더 세부적으로 나눌 필요가 있을 때만 "### 소소제목"을
+      한 단계 더 써서 계층을 표현하세요 (억지로 두 단계를 다 채우지
+      말고, 필요할 때만).
+    - 소제목 줄 다음에는 반드시 빈 줄을 하나 넣고 그 아래에 내용을
+      쓰세요.
+    - 문장 하나짜리 짧은 답변에는 소제목을 넣지 마세요 — 구조화가
+      필요한 긴 답변에만 사용하세요.
+    - "#"을 다른 용도로 쓰지 말고, 소제목 마커로만 쓰세요.
+18. 답변은 반드시 아래 JSON 형식 하나로만 응답하세요. 코드블록(```)이나
+    JSON 앞뒤의 다른 텍스트 없이, 순수 JSON 객체만 출력하세요:
+    {"answer": "<지금까지의 규칙을 지킨 답변 본문>",
+     "follow_up_questions": ["<후속 질문1>", "<후속 질문2>", ...]}
+    follow_up_questions는 이번 답변과 [데이터]를 근거로 사용자가 자연스럽게
+    이어서 물어볼 만한 질문을 사업 담당자 말투로 제안하는 것입니다. 반드시
+    [데이터]에 있는 값으로 답할 수 있는 질문만 제안하고, 데이터에 없는
+    내용을 다뤄야 하는 질문은 만들지 마세요. 이어서 물어볼 만한 자연스러운
+    질문이 없으면 빈 배열로 두세요 — 억지로 채우지 마세요. 최대 3개까지만
+    제안하고, 자연스러운 후속 질문이 3개보다 적으면 그만큼만 담으세요
+    (매번 3개를 다 채울 필요는 없습니다).
 """
 
 
@@ -148,8 +202,8 @@ class ChatService:
             "8개 장벽 데이터": self._repo.get_barrier_pattern_analysis(),
             "국가별 병목 패턴": self._repo.get_bottleneck_profiles(),
             "병목 유형 요약": self._repo.get_bottleneck_type_summary(),
-            "Gap-장벽 상관관계": self._repo.get_gap_barrier_correlation(),
-            "민감도 분석": self._repo.get_sensitivity_analysis(),
+            "Gap-장벽 상관관계": _strip_indicator_codes(self._repo.get_gap_barrier_correlation()),
+            "민감도 분석": _strip_indicator_codes(self._repo.get_sensitivity_analysis()),
             "23개국 지표 분포": self._repo.get_country_indicator_distribution(),
             "국가별 상대적 위치(3분위)": self._repo.get_country_pattern_profiles(),
         }
@@ -250,22 +304,29 @@ class ChatService:
                 matched = self._match_country(question, known)
                 if not matched:
                     return ""
-                # 국가당 최대 826행까지 나올 수 있어 컨텍스트 초과를 유발한 적이 있음
-                # (실측: UAE 826행 + analysis_long 246행 → 128k 토큰 한도 초과) - 상한을 둔다.
+                # 국가당 최대 ~840행까지 나오고, 예전엔 JSON(키 이름 반복)으로 통째로
+                # 넣다가 UAE 826행 + analysis_long 246행 조합에서 128k 토큰 한도를
+                # 넘긴 적이 있었다. 지금은 topic|segment|sample_n|item|value 형태의
+                # 파이프 구분 텍스트로 직렬화해 키 이름 반복을 없애서(같은 정보량 기준
+                # 토큰을 크게 줄임), 국가 데이터를 자르지 않고 다 넣을 수 있게 했다.
+                # 그래도 한 번에 여러 국가가 매칭되는 극단적인 경우를 대비한 안전장치로
+                # 넉넉한 상한만 남겨둔다.
                 cur.execute(
                     "SELECT topic, segment, sample_n, item, value "
                     "FROM potential_tourist_2025_survey "
                     "WHERE \"group\" = '거주국별' AND segment = ANY(%s) "
-                    "ORDER BY page LIMIT 300",
+                    "ORDER BY page LIMIT 5000",
                     (matched,),
                 )
                 rows = cur.fetchall()
         if not rows:
             return ""
+        lines = [f"{r['topic']}|{r['segment']}|{r['sample_n']}|{r['item']}|{r['value']}" for r in rows]
         return (
             "[2025 잠재방한여행객조사 — dashboard_data_dictionary.md 15절, 규칙 15번 준수. "
-            "국가 총계만 있음, 성별/연령별 세그먼트 없음. 컨텍스트 크기 제한으로 일부 항목만 포함됨]\n"
-            f"{json.dumps(rows, ensure_ascii=False)}"
+            "국가 총계만 있음, 성별/연령별 세그먼트 없음. 아래는 컬럼 순서가 "
+            "topic|segment|sample_n|item|value인 표를 한 줄씩 나열한 것이며, 여기 없는 "
+            "topic/item 조합은 이번 질문에 대해 존재하지 않는 것이다]\n" + "\n".join(lines)
         )
 
     def _build_analysis_long_context(self, question: str) -> str:
@@ -290,7 +351,7 @@ class ChatService:
             f"{json.dumps(rows, ensure_ascii=False)}"
         )
 
-    def ask(self, question: str, history: list[dict] | None = None) -> str:
+    def ask(self, question: str, history: list[dict] | None = None) -> dict:
         # analysis_long은 다른 표들의 원천 롱포맷이라 내용이 중복이고, 국가당 최대
         # 수백 행이라 상시 주입하면 컨텍스트 한도를 넘긴다(dashboard_data_dictionary.md
         # 12절 설계 의도대로 "출처 확인용"으로만 남겨두고 기본 주입에서는 제외한다).
@@ -315,6 +376,20 @@ class ChatService:
         response = self._client.chat.completions.create(
             model=LLM_MODEL,
             seed=42,
+            response_format={"type": "json_object"},
             messages=messages,
         )
-        return response.choices[0].message.content
+        raw = response.choices[0].message.content
+        try:
+            parsed = json.loads(raw)
+            answer = parsed.get("answer") or ""
+            follow_ups = parsed.get("follow_up_questions") or []
+            if not isinstance(follow_ups, list):
+                follow_ups = []
+            follow_ups = [str(q) for q in follow_ups if isinstance(q, str) and q.strip()][:3]
+        except (json.JSONDecodeError, AttributeError):
+            # 모델이 규칙 18번(JSON 형식)을 어기고 순수 텍스트로 답하면, 그 텍스트를
+            # 그대로 답변으로 쓰고 후속 질문은 비워둔다 - 답변 자체를 실패시키지 않는다.
+            answer = raw
+            follow_ups = []
+        return {"answer": answer, "follow_up_questions": follow_ups}

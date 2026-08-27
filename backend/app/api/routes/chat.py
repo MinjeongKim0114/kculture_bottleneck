@@ -29,4 +29,4 @@ def chat(
     시작하면 프론트에서 빈 배열로 초기화되므로 대화창 간 기억은 유지되지 않는다.
     """
     history = [{"role": m.role, "content": m.content} for m in request.history]
-    return {"answer": service.ask(request.question, history)}
+    return service.ask(request.question, history)

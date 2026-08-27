@@ -18,6 +18,28 @@ function renderInline(text: string, keyPrefix: string) {
 function renderAnswer(content: string) {
   const lines = content.split("\n");
   return lines.map((line, i) => {
+    const subheading = /^\s*###\s+(.*)/.exec(line);
+    if (subheading) {
+      return (
+        <div
+          key={i}
+          style={{ fontSize: 14, fontWeight: 700, marginTop: i === 0 ? 0 : 10, marginBottom: 4 }}
+        >
+          {renderInline(subheading[1], `l${i}`)}
+        </div>
+      );
+    }
+    const heading = /^\s*##\s+(.*)/.exec(line);
+    if (heading) {
+      return (
+        <div
+          key={i}
+          style={{ fontSize: 15.5, fontWeight: 700, marginTop: i === 0 ? 0 : 14, marginBottom: 4 }}
+        >
+          {renderInline(heading[1], `l${i}`)}
+        </div>
+      );
+    }
     const bullet = /^\s*-\s+(.*)/.exec(line);
     if (bullet) {
       return (
@@ -36,6 +58,7 @@ interface ChatMessage {
   role: "user" | "assistant";
   content: string;
   error?: boolean;
+  followUps?: string[];
 }
 
 interface Conversation {
@@ -79,7 +102,7 @@ export default function ChatPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [input, setInput] = useState("");
-  const [pendingId, setPendingId] = useState<string | null>(null);
+  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
   const [hydrated, setHydrated] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -100,6 +123,7 @@ export default function ChatPage() {
   }, [conversations, hydrated]);
 
   const activeMessages = conversations.find((c) => c.id === activeId)?.messages ?? [];
+  const isActivePending = activeId !== null && pendingIds.has(activeId);
 
   const scrollToBottom = () => {
     requestAnimationFrame(() => {
@@ -119,7 +143,10 @@ export default function ChatPage() {
 
   const sendQuestion = async (question: string) => {
     const trimmed = question.trim();
-    if (!trimmed || pendingId) return;
+    // activeId가 null이면(새 대화) 아직 pendingIds에 있을 수 없으므로 항상 허용된다 -
+    // 대화별로 독립적으로 로딩 상태를 추적해서, 한 대화가 응답을 기다리는 동안에도
+    // 다른 대화(또는 새 대화)에서는 자유롭게 질문을 보낼 수 있다.
+    if (!trimmed || (activeId !== null && pendingIds.has(activeId))) return;
 
     const history = activeMessages
       .filter((m) => !m.error)
@@ -140,17 +167,25 @@ export default function ChatPage() {
 
     appendMessage(conversationId, { role: "user", content: trimmed });
     setInput("");
-    setPendingId(conversationId);
+    setPendingIds((prev) => new Set(prev).add(conversationId!));
     scrollToBottom();
 
     try {
       const res = await postChat(trimmed, history);
-      appendMessage(conversationId, { role: "assistant", content: res.answer });
+      appendMessage(conversationId, {
+        role: "assistant",
+        content: res.answer,
+        followUps: res.follow_up_questions,
+      });
     } catch (err) {
       const message = err instanceof ApiError ? err.message : "알 수 없는 오류가 발생했습니다.";
       appendMessage(conversationId, { role: "assistant", content: message, error: true });
     } finally {
-      setPendingId(null);
+      setPendingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(conversationId!);
+        return next;
+      });
       scrollToBottom();
     }
   };
@@ -205,7 +240,9 @@ export default function ChatPage() {
         </p>
         <h1 style={{ fontSize: 22, margin: "0 0 6px" }}>AI 애널리스트에게 직접 물어보세요</h1>
         <p style={{ fontSize: 12.5, color: "var(--text-secondary)", margin: 0, maxWidth: 720 }}>
-          직접 수집한 정량/정성 데이터를 근거로만 답변하는 AI챗봇입니다. 같은 대화창 안에서는 이전 질문 맥락을 기억하고, 대화 목록은 이 브라우저에 저장되어 나중에 다시 열어볼 수 있습니다.
+          직접 수집한 정량/정성 데이터를 근거로만 답변하는 AI챗봇입니다.
+          <br />
+          같은 대화창 안에서는 이전 질문 맥락을 기억하고, 대화 목록은 이 브라우저에 저장되어 나중에 다시 열어볼 수 있습니다.
         </p>
       </header>
 
@@ -393,10 +430,38 @@ export default function ChatPage() {
                 >
                   {msg.role === "assistant" && !msg.error ? renderAnswer(msg.content) : msg.content}
                 </div>
+
+                {msg.role === "assistant" &&
+                  !msg.error &&
+                  i === activeMessages.length - 1 &&
+                  !!msg.followUps?.length && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 2 }}>
+                      {msg.followUps.map((q) => (
+                        <button
+                          key={q}
+                          onClick={() => sendQuestion(q)}
+                          disabled={isActivePending}
+                          style={{
+                            textAlign: "left",
+                            border: "1px solid var(--accent-primary-soft)",
+                            borderRadius: "var(--radius-md)",
+                            background: "transparent",
+                            padding: "8px 12px",
+                            fontSize: 12.5,
+                            color: "var(--accent-primary)",
+                            cursor: isActivePending ? "default" : "pointer",
+                            opacity: isActivePending ? 0.5 : 1,
+                          }}
+                        >
+                          {q}
+                        </button>
+                      ))}
+                    </div>
+                  )}
               </div>
             ))}
 
-            {pendingId !== null && pendingId === activeId && (
+            {isActivePending && (
               <div style={{ alignSelf: "flex-start", display: "flex", alignItems: "center", gap: 8 }}>
                 <div
                   aria-hidden
@@ -421,8 +486,8 @@ export default function ChatPage() {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="어느 나라를 분석해볼까요?🔍"
-              disabled={pendingId !== null}
+              placeholder={activeMessages.length === 0 ? "어느 나라를 분석해볼까요?🔍" : ""}
+              disabled={isActivePending}
               style={{
                 flex: 1,
                 border: "1px solid var(--border-hairline)",
@@ -436,17 +501,17 @@ export default function ChatPage() {
             />
             <button
               type="submit"
-              disabled={pendingId !== null || !input.trim()}
+              disabled={isActivePending || !input.trim()}
               style={{
                 border: "none",
                 borderRadius: 999,
                 background:
-                  pendingId !== null || !input.trim() ? "var(--baseline)" : "var(--accent-primary)",
+                  isActivePending || !input.trim() ? "var(--baseline)" : "var(--accent-primary)",
                 color: "#fff",
                 padding: "0 24px",
                 fontSize: 13.5,
                 fontWeight: 600,
-                cursor: pendingId !== null || !input.trim() ? "default" : "pointer",
+                cursor: isActivePending || !input.trim() ? "default" : "pointer",
               }}
             >
               전송
