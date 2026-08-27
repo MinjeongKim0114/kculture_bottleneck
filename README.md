@@ -14,13 +14,13 @@
 
 ![Overview 화면](image.png)
 
-### [Country Explorer — 국가 클릭 시 상세 패널]
+### [Country Detail Panel — 국가 클릭 시 상세 패널]
 
-![Country Explorer 화면](image.png)
+![Country Detail Panel 화면](image.png)
 
-### [Gap / Barrier 요약 카드]
+### [AI 챗봇 — 멀티턴 대화 + 추천 후속 질문]
 
-![Gap 요약 카드](image.png)
+![AI 챗봇 화면](image.png)
 
 ---
 
@@ -53,14 +53,14 @@
 
 ## 핵심 기능 3개
 
-1. 23개국 Gap/장벽 대시보드 (Overview → Country Explorer → Gap/Barrier Explorer → Comparison)
+1. Overview 대시보드 (세계지도 기반 23개국 탐색 → 국가 클릭 시 상세 패널)
 2. Supabase(PostgreSQL) 기반 정량 데이터 API (FastAPI)
 3. 정량 데이터 기반 AI 챗봇 (`POST /api/chat` + Next.js 채팅 UI) — RAG 없이, DB에 실제로 있는 값만 근거로 답변하고, 같은 대화창 안에서는 이전 turn을 기억함
 
 ## 이번 MVP에서 제외한 기능
 
+- **Gap Explorer / Barrier Explorer / Comparison 화면** — 백엔드 API(`GET /api/gaps`, `/api/barriers`, `/api/comparison`)는 이미 구현되어 있지만, 이를 소비하는 프론트엔드 화면은 아직 없습니다. 현재 프론트엔드는 Overview(세계지도 + 국가 상세 패널)와 AI 챗봇 두 화면만 존재합니다.
 - 로그인/인증
-- n8n ETL 자동화 파이프라인
 - 성별/연령별/거주국별 세그먼트 집계 분석 (원본 세그먼트 데이터는 적재됐으나 집계/대시보드는 없음)
 - 대화 기록의 서버 측 영구 저장 (현재는 브라우저 `localStorage`에만 저장 — 기기/브라우저를 바꾸면 안 보임)
 
@@ -72,14 +72,15 @@
 
 # 4. 사용자 흐름 (usecase)
 
-**대시보드**
+**대시보드 (구현된 흐름)**
 
 ```
-접속 → Overview(세계지도, 23개국 한눈에 보기)
-     → 국가 클릭 → Country Detail Panel(문화경험률/호감도/방한의향/Direct·Conditional Gap/8개 장벽)
-     → Gap Explorer / Barrier Explorer 에서 심화 탐색
-     → 2~3개국 선택해 Comparison
+접속 → Overview(세계지도, 지표 토글로 23개국 한눈에 보기)
+     → 국가 클릭/호버 → Country Detail Panel
+       (문화경험률/호감도/방한의향/Direct·Conditional Gap/주요 장벽 Top3/병목 프로파일 플래그)
 ```
+
+Gap Explorer(Direct/Conditional Gap 축 비교), Barrier Explorer(8개 장벽 heatmap), Comparison(2~3개국 나란히 비교)은 백엔드 API까지만 구현되어 있고 프론트엔드 화면은 아직 없습니다 — 5장 참고.
 
 **AI 챗봇**
 
@@ -96,25 +97,25 @@
 
 # 5. 주요 기능
 
-## 5.1 Overview
+## 5.1 Overview *(구현됨)*
 
-세계지도에서 23개국을 한눈에 보고, 국가를 클릭하면 상세 패널이 열립니다. Direct/Conditional Gap 요약 카드와 병목 유형(Type A~G) 요약 카드를 함께 제공하며, 전체 국가를 표 형태로 펼쳐볼 수 있습니다.
+세계지도에서 23개국을 지표(문화경험률/방한의향 등) 토글로 색상 비교하며 한눈에 보고, 국가를 클릭하거나 호버하면 오른쪽에 상세 패널이 열립니다.
 
-## 5.2 Country Explorer
+## 5.2 Country Detail Panel *(구현됨)*
 
-선택한 국가의 문화경험률, 한류 호감도, 방한의향, Direct Gap, Conditional Gap, 8개 장벽 중 상위 3개, tercile(상위/중위/하위 3분위) 위치, 병목 유형 플래그(Type A~G)를 함께 보여줍니다.
+선택한 국가의 문화경험률, 한류 호감도, 방한의향, Direct Gap, Conditional Gap(각각 tercile 배지 포함), 주요 장벽 Top3(방문 비의향자 기준), 병목 프로파일 플래그(5개 장벽 그룹 중 해당 여부)와 관찰 패턴 텍스트를 보여줍니다. 계산 기준·해석 주의사항은 접을 수 있는 섹션으로 따로 제공합니다.
 
-## 5.3 Gap Explorer
+## 5.3 Gap Explorer *(백엔드 API만 구현 — 프론트 화면 없음)*
 
-Direct Gap과 Conditional Gap을 서로 다른 축으로 분리해서 비교하고, 두 Gap 사이의 상관관계를 함께 제공합니다.
+`GET /api/gaps`가 Direct Gap과 Conditional Gap을 서로 다른 축으로 분리해 반환하고, 두 Gap 사이의 상관관계 데이터도 함께 제공합니다. 이를 시각화하는 프론트엔드 화면은 아직 없습니다.
 
-## 5.4 Barrier Explorer
+## 5.4 Barrier Explorer *(백엔드 API만 구현 — 프론트 화면 없음)*
 
-23개국 x 8개 장벽(한류 관심 부재, 낮은 한국 인지도, 부정적 한국 이미지, 불편한 언어소통, 여행경비/물가, 비자/출입국 절차, 장거리 비행, 불편한 종교환경) heatmap을 5개 그룹(인지/관심, 이미지, 경제/물리적 접근성, 제도/언어, 종교/문화환경)으로 묶어 제공합니다.
+`GET /api/barriers`가 23개국 x 8개 장벽(한류 관심 부재, 낮은 한국 인지도, 부정적 한국 이미지, 불편한 언어소통, 여행경비/물가, 비자/출입국 절차, 장거리 비행, 불편한 종교환경) 데이터를 5개 그룹(인지/관심, 이미지, 경제/물리적 접근성, 제도/언어, 종교/문화환경)으로 묶어 반환합니다. heatmap 화면은 아직 없습니다.
 
-## 5.5 Comparison
+## 5.5 Comparison *(백엔드 API만 구현 — 프론트 화면 없음)*
 
-2~3개국을 선택해 Country Explorer 프로파일을 나란히 비교합니다.
+`GET /api/comparison?countries=...`으로 2~3개국의 프로파일을 함께 조회할 수 있습니다. 나란히 비교하는 화면은 아직 없습니다.
 
 ## 5.6 AI 챗봇
 
@@ -160,9 +161,9 @@ Direct Gap과 Conditional Gap을 서로 다른 축으로 분리해서 비교하�
 - pgvector — Reddit 정성 데이터(942건) 임베딩 검색 (text-embedding-3-small). 질문마다
   의미적으로 가까운 사례를 top-K로 찾아 챗봇 컨텍스트에 주입 (2026-08-26 추가)
 
-## 계획되어 있으나 아직 미구현
+## Automation / ETL
 
-- n8n (ETL 자동화)
+- **n8n** (self-hosted, Docker) — Reddit 정성 데이터 파이프라인(수집 → 전처리 → AI 사업테마 분류 → Supabase 적재 → 임베딩 생성)을 매주 자동 실행. n8n 컨테이너는 Python이 아예 없는 hardened 이미지라 파이프라인 스크립트를 직접 실행할 수 없어서, FastAPI의 `POST /internal/reddit-pipeline`(토큰 인증)을 호출해 서브프로세스로 실행하고 결과 요약만 돌려받는 구조입니다. 검토가 애매한("애매" 판정) 항목이 있으면 Gmail로 알림 메일을 보냅니다. (2026-08-26 구축, 동작 검증 완료)
 
 ---
 
@@ -184,10 +185,18 @@ Direct Gap과 Conditional Gap을 서로 다른 축으로 분리해서 비교하�
    │       ▼
    │  [Next.js 프론트엔드 대시보드]
    │
-   └─ POST /api/chat
-           │  정량 데이터를 컨텍스트로 주입
+   ├─ POST /api/chat  (history 포함, follow_up_questions 함께 응답)
+   │       │  정량 데이터를 컨텍스트로 주입
+   │       ▼
+   │  [OpenAI gpt-5.6-terra]  ──▶  [Next.js /chat 채팅 UI, localStorage에 대화 저장]
+   │
+   └─ POST /internal/reddit-pipeline  (X-Internal-Token 인증)
+           │  5개 파이프라인 스크립트를 서브프로세스로 순차 실행
            ▼
-      [OpenAI gpt-5.6-terra]
+      [수집 → 전처리 → 사업테마 분류 → Supabase 적재 → 임베딩 생성]
+           ▲
+           │  Schedule Trigger(매주) → HTTP Request → IF(애매 판정 있음) → Send Email
+      [n8n, self-hosted Docker]
 ```
 
 `DataRepository`는 추상 인터페이스로 정의되어 있어(`backend/app/data_access/repository.py`), CSV 기반 구현(`CsvDataRepository`)과 PostgreSQL 기반 구현(`PostgresDataRepository`)을 서비스/API 계층 변경 없이 교체할 수 있습니다.
@@ -257,19 +266,19 @@ GET /api/countries
 GET /api/countries/{country}
 ```
 
-### 9.4 Gap Explorer
+### 9.4 Gap Explorer *(API만 존재, 프론트 화면 미구현)*
 
 ```
 GET /api/gaps
 ```
 
-### 9.5 Barrier Explorer
+### 9.5 Barrier Explorer *(API만 존재, 프론트 화면 미구현)*
 
 ```
 GET /api/barriers
 ```
 
-### 9.6 Comparison
+### 9.6 Comparison *(API만 존재, 프론트 화면 미구현)*
 
 ```
 GET /api/comparison?countries=러시아&countries=일본
@@ -305,6 +314,29 @@ Content-Type: application/json
 ```
 
 `follow_up_questions`는 최대 3개까지이며, 자연스러운 후속 질문이 없으면 빈 배열일 수 있습니다.
+
+### 9.8 내부 파이프라인 트리거 (n8n 전용)
+
+```
+POST /internal/reddit-pipeline
+X-Internal-Token: <backend/.env의 INTERNAL_PIPELINE_TOKEN>
+```
+
+Reddit 정성 데이터 수집~임베딩 5단계 스크립트를 순서대로 실행합니다. 외부에서 함부로 못 부르도록 토큰으로 게이트되어 있으며, n8n(Docker)의 Schedule Trigger가 매주 이 엔드포인트를 호출합니다.
+
+응답 예시:
+
+```json
+{
+  "status": "ok",
+  "new_total": 12,
+  "ambiguous_count": 2,
+  "ambiguous": [ "..." ],
+  "logs": { "collect_reddit_qualitative.py": { "returncode": 0, "...": "..." } }
+}
+```
+
+`ambiguous_count`가 0보다 크면 n8n 워크플로가 Gmail로 검토 알림 메일을 보냅니다.
 
 ---
 
@@ -348,6 +380,8 @@ dashboard_data_dictionary.md에 정의된 12개 표를 그대로 Supabase 테이
 cd backend
 pip install -r requirements.txt
 # backend/.env 에 DATABASE_URL(Supabase 연결 문자열), LLM_API_KEY(OpenAI API 키) 설정
+# INTERNAL_PIPELINE_TOKEN은 n8n Reddit 파이프라인(POST /internal/reddit-pipeline)을
+# 쓸 때만 필요 — n8n 없이 대시보드/챗봇만 쓸 거면 생략 가능
 uvicorn app.main:app --reload
 ```
 
@@ -359,6 +393,10 @@ npm install
 # frontend/.env.local 에 NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000 설정
 npm run dev
 ```
+
+## n8n (선택 — Reddit 파이프라인 주간 자동화용)
+
+대시보드/챗봇 실행에는 필요 없습니다. self-hosted Docker로 n8n을 띄우고, Schedule Trigger → HTTP Request(`POST http://host.docker.internal:8000/internal/reddit-pipeline`, `X-Internal-Token` 헤더) → IF(`ambiguous_count > 0`) → Send Email 순서로 워크플로를 구성하면 됩니다.
 
 ---
 
@@ -528,6 +566,48 @@ reasoning 모델은 Chat Completions API에서 `temperature`를 커스텀 값으
 
 프롬프트에 값 안의 코드도 옮기지 말라는 규칙을 추가한 것과 별개로, 더 확실한 방어로 데이터를 프롬프트에 넣기 전에 정규식(`\([A-Za-z0-9-]+\)`)으로 코드 부분 자체를 제거했습니다 — 모델이 애초에 코드를 볼 수 없게 데이터 계층에서 원천 차단하는 편이, 프롬프트 지시에만 의존하는 것보다 확실했습니다.
 
+## 12.13 n8n의 hardened Docker 이미지 안에서 Python 스크립트를 직접 실행할 수 없던 문제
+
+#### 현상
+
+Reddit 파이프라인(수집→분류→적재→임베딩)을 n8n의 Execute Command 노드나 Code 노드로 직접 실행하려 했으나 계속 실패했습니다.
+
+#### 원인
+
+self-hosted n8n을 Docker의 공식 "hardened" Alpine 이미지로 띄웠는데, 이 이미지에는 Python은 물론 패키지 매니저조차 없습니다. Code 노드의 "네이티브 Python" 태스크 러너 모드도 문서상 파일시스템/네트워크 접근이 막혀 있어 이 파이프라인엔 애초에 쓸 수 없는 옵션이었습니다.
+
+#### 해결
+
+n8n 컨테이너 안에서 직접 실행하는 대신, `backend/app/api/routes/internal.py`에 `POST /internal/reddit-pipeline` 엔드포인트를 새로 만들어 FastAPI(호스트에서 실행 중, Python 환경 완비)가 5개 스크립트를 서브프로세스로 실행하고 결과 요약만 HTTP 응답으로 돌려주게 했습니다. n8n은 Docker Desktop이 제공하는 `http://host.docker.internal:8000`으로 이 엔드포인트를 호출합니다. 외부 스케줄러(n8n)와 핵심 로직(파이프라인 실행)의 역할을 API 경계로 명확히 분리한 것이 실행 환경 제약을 우회하는 동시에 책임도 깔끔하게 나누는 결과가 됐습니다.
+
+## 12.14 Windows 작업 스케줄러가 권한 거부로 아예 동작하지 않은 문제
+
+#### 현상
+
+n8n의 스케줄 호출이 성공하려면 백엔드(FastAPI)가 항상 떠 있어야 하는데, 컴퓨터 재부팅 시 자동 실행을 `schtasks`로 등록하려 하자 가장 단순한 작업조차 "Access is denied"로 거부됐습니다.
+
+#### 원인
+
+해당 컴퓨터의 그룹 정책(Group Policy) 설정으로 작업 스케줄러 등록 자체가 잠겨 있는 것으로 추정됩니다.
+
+#### 해결
+
+`schtasks` 대신 Windows 시작프로그램 폴더(`shell:startup`)에 `backend/start_backend.bat`를 가리키는 바로가기(.lnk)를 만들어, 로그인 시 최소화된 창으로 백엔드가 자동 실행되게 했습니다. 특정 환경에서 표준 자동화 도구가 정책으로 막혀 있으면, 우회로(시작프로그램 폴더 등)가 있는지부터 확인하는 게 낫다는 것을 확인했습니다.
+
+## 12.15 Gmail SMTP 587번 포트에서 SSL 협상 에러
+
+#### 현상
+
+n8n의 Send Email 노드로 Gmail(587번 포트, 앱 비밀번호 인증)에 연결하니 `SSL routines:tls_validate_record_header:wrong version number` 에러가 발생했습니다.
+
+#### 원인
+
+n8n의 SMTP 자격증명 설정에는 "SSL/TLS"와 "Disable STARTTLS"라는 별개의 토글이 있는데, 587번 포트는 STARTTLS로 스스로 암호화 연결을 협상하는 방식이라 "SSL/TLS" 토글을 켜면 안 됩니다. 이 둘을 혼동해 SSL/TLS를 켠 채로 587번 포트에 접속을 시도했습니다.
+
+#### 해결
+
+두 토글을 모두 꺼서(SSL/TLS 끄기, STARTTLS는 비활성화하지 않기) 587번 포트 기본 동작에 맞췄습니다. 이후 전체 워크플로(Schedule Trigger → HTTP Request → IF → Send Email)가 정상 동작해 실제 Gmail 수신함으로 알림 메일이 도착하는 것까지 확인했습니다.
+
 ---
 
 # 13. 회고
@@ -557,12 +637,12 @@ reasoning 모델은 Chat Completions API에서 `temperature`를 커스텀 값으
 
 # 14. 향후 개선 방향
 
+- **Gap Explorer / Barrier Explorer / Comparison 프론트엔드 화면 구현** — 백엔드/데이터 쪽은 비교적 안정화됐고, 이 3개 화면이 현재 가장 큰 미구현 조각입니다. 대응하는 API(`GET /api/gaps`, `/api/barriers`, `/api/comparison`)는 이미 있으므로 프론트엔드 작업만 남아있습니다.
 - LLM 응답의 사실 일치 여부를 자동으로 확인하는 후처리 검증 단계 추가 — 답변에 나온 숫자를 정규식으로 추출해 이번 turn에 실제로 주입한 데이터 값과 대조하는 방식을 검토 중. 12.10/12.11에서 고친 것은 "없는 데이터를 언급하는" 유형과 "잘려서 안 보이는" 유형이고, 진짜 값 여러 개를 조합해 새 숫자를 합성하는 유형(예: 서로 다른 항목의 응답자 수/비율을 섞어 존재하지 않는 통계를 만들어냄)은 프롬프트 규칙만으로는 완전히 막지 못해 이 단계가 필요하다고 판단
 - 대화 기록의 서버 측 저장 — 현재는 브라우저 `localStorage`뿐이라 기기를 바꾸면 안 보임. 로그인 붙기 전까지는 우선순위 낮음
-- n8n 기반 ETL 자동화 — 2026-08-26 검토 결과, Reddit 라벨링 로직이 아직 계속 수정되고
-  있어 파이프라인이 안정된 뒤로 보류. 단순 스케줄 실행이 아니라 수집→분류→사람 검토→
-  DB반영을 잇는 다단계 워크플로가 목적이라, 로직이 안정된 뒤 이메일 알림(검토 대기 알림)과
-  함께 도입 검토
+- n8n 파이프라인 추가 개선 — 현재 상태로 동작 검증까지 끝났지만(6장 Automation/ETL
+  참고), "신규 항목 없음" 하트비트 알림이나 Reddit 외 다른 수집 소스로의 확장은 아직
+  다루지 않음
 - 세그먼트별(성별/연령별/거주국별) 분석 — 2025 잠재방한여행객조사 데이터 자체는 이미
   결합·적재 완료됐고 챗봇이 개별 질문에 인용 가능하지만, 국가별 세그먼트 Gap을 비교하는
   집계 분석/대시보드는 아직 없음. 구체적인 비교 질문이 생기면 그때 착수 권장
