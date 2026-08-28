@@ -47,6 +47,51 @@ def _country_search_terms(country: str) -> list[str]:
     return [country]
 
 
+# citations 검증(규칙 19번) - backend/experiments/verify_grounding_poc.py에서
+# 라이브 테스트로 확인한 방식을 그대로 가져온 것. 완전일치로 비교하면 모델이
+# 긴 item 라벨을 줄여 쓰거나(예: "...- 전문 가이드 동반" -> "전문 가이드 동반")
+# 원본 데이터의 topic 표기가 항목마다 미묘하게 다른 경우에 실제로는 맞는
+# 인용도 오탐 처리됐다 - 정규화 후 부분일치 + 후보 다중 허용으로 이를 흡수한다.
+_CITATION_PUNCT_RE = re.compile(r"[\s/\-·,()]+")
+
+
+def _normalize_citation_text(text: str) -> str:
+    return _CITATION_PUNCT_RE.sub("", text or "")
+
+
+def _verify_survey_citations(
+    citations: list[dict], survey_rows: list[dict], tol: float = 0.05
+) -> list[dict]:
+    """citations 각각이 실제 2025 조사 원천 행(survey_rows) 중 하나와
+    country + item(부분일치) + value가 맞는지 확인한다. survey_rows는 이번
+    턴에 실제로 프롬프트에 주입한 행 그대로를 재사용한다(별도 DB 재조회 없음)."""
+    by_country: dict[str, list[dict]] = {}
+    for r in survey_rows:
+        by_country.setdefault(r["segment"], []).append(
+            {"item_norm": _normalize_citation_text(r["item"]), "value": r["value"]}
+        )
+
+    problems = []
+    for c in citations:
+        candidates = by_country.get(c.get("country"), [])
+        cited_norm = _normalize_citation_text(c.get("item", ""))
+        matches = [
+            cand for cand in candidates
+            if cited_norm and (cited_norm in cand["item_norm"] or cand["item_norm"] in cited_norm)
+        ]
+        if not matches:
+            problems.append({"citation": c, "reason": "no_match"})
+            continue
+        try:
+            cited_value = float(c.get("value"))
+        except (TypeError, ValueError):
+            problems.append({"citation": c, "reason": "not_a_number"})
+            continue
+        if not any(abs(m["value"] - cited_value) <= tol for m in matches):
+            problems.append({"citation": c, "reason": "value_mismatch"})
+    return problems
+
+
 SYSTEM_PROMPT = """당신은 '한류 인지-행동 Gap' 분석 대시보드의 AI Analyst입니다.
 사용자 메시지에 포함된 [데이터] JSON에 있는 값만 근거로 답변하세요.
 
@@ -175,7 +220,8 @@ SYSTEM_PROMPT = """당신은 '한류 인지-행동 Gap' 분석 대시보드의 A
 18. 답변은 반드시 아래 JSON 형식 하나로만 응답하세요. 코드블록(```)이나
     JSON 앞뒤의 다른 텍스트 없이, 순수 JSON 객체만 출력하세요:
     {"answer": "<지금까지의 규칙을 지킨 답변 본문>",
-     "follow_up_questions": ["<후속 질문1>", "<후속 질문2>", ...]}
+     "follow_up_questions": ["<후속 질문1>", "<후속 질문2>", ...],
+     "citations": [{"country": "...", "item": "...", "value": 12.3}, ...]}
     follow_up_questions는 이번 답변과 [데이터]를 근거로 사용자가 자연스럽게
     이어서 물어볼 만한 질문을 사업 담당자 말투로 제안하는 것입니다. 반드시
     [데이터]에 있는 값으로 답할 수 있는 질문만 제안하고, 데이터에 없는
@@ -183,6 +229,15 @@ SYSTEM_PROMPT = """당신은 '한류 인지-행동 Gap' 분석 대시보드의 A
     질문이 없으면 빈 배열로 두세요 — 억지로 채우지 마세요. 최대 3개까지만
     제안하고, 자연스러운 후속 질문이 3개보다 적으면 그만큼만 담으세요
     (매번 3개를 다 채울 필요는 없습니다).
+19. citations는 [2025 잠재방한여행객조사] 블록에서 인용한 수치마다 하나씩
+    기입하세요(그 블록을 인용하지 않았다면 citations는 빈 배열). 각 항목은:
+    - country: 그 수치가 속한 국가명
+    - item: 그 블록의 item 필드 원문 (요약하거나 바꿔 쓰지 말고, 원문에 있는
+      그대로 — 접두어를 포함해 그대로 옮기는 편이 짧게 줄이는 것보다 안전)
+    - value: 그 블록의 value 필드 값 그대로 (반올림/추정 금지)
+    이 배열은 답변 본문과 별개로, 사후에 실제 데이터와 자동 대조하는 데
+    쓰입니다. 다른 데이터 출처([데이터] JSON, 정성 참고자료 등)에서 인용한
+    수치는 citations에 넣지 마세요.
 """
 
 
@@ -294,7 +349,7 @@ class ChatService:
             f"{json.dumps(rows, ensure_ascii=False)}"
         )
 
-    def _build_2025_survey_context(self, question: str) -> str:
+    def _fetch_2025_survey_rows(self, question: str) -> list[dict]:
         with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn:
             with conn.cursor() as cur:
                 cur.execute(
@@ -303,7 +358,7 @@ class ChatService:
                 known = [r["segment"] for r in cur.fetchall()]
                 matched = self._match_country(question, known)
                 if not matched:
-                    return ""
+                    return []
                 # 국가당 최대 ~840행까지 나오고, 예전엔 JSON(키 이름 반복)으로 통째로
                 # 넣다가 UAE 826행 + analysis_long 246행 조합에서 128k 토큰 한도를
                 # 넘긴 적이 있었다. 지금은 topic|segment|sample_n|item|value 형태의
@@ -318,10 +373,14 @@ class ChatService:
                     "ORDER BY page LIMIT 5000",
                     (matched,),
                 )
-                rows = cur.fetchall()
-        if not rows:
+                return cur.fetchall()
+
+    def _build_2025_survey_context(self, survey_rows: list[dict]) -> str:
+        if not survey_rows:
             return ""
-        lines = [f"{r['topic']}|{r['segment']}|{r['sample_n']}|{r['item']}|{r['value']}" for r in rows]
+        lines = [
+            f"{r['topic']}|{r['segment']}|{r['sample_n']}|{r['item']}|{r['value']}" for r in survey_rows
+        ]
         return (
             "[2025 잠재방한여행객조사 — dashboard_data_dictionary.md 15절, 규칙 15번 준수. "
             "국가 총계만 있음, 성별/연령별 세그먼트 없음. 아래는 컬럼 순서가 "
@@ -351,28 +410,7 @@ class ChatService:
             f"{json.dumps(rows, ensure_ascii=False)}"
         )
 
-    def ask(self, question: str, history: list[dict] | None = None) -> dict:
-        # analysis_long은 다른 표들의 원천 롱포맷이라 내용이 중복이고, 국가당 최대
-        # 수백 행이라 상시 주입하면 컨텍스트 한도를 넘긴다(dashboard_data_dictionary.md
-        # 12절 설계 의도대로 "출처 확인용"으로만 남겨두고 기본 주입에서는 제외한다).
-        blocks = [
-            self._build_content_reasons_context(question),
-            self._build_bottleneck_observations_context(question),
-            self._build_2025_survey_context(question),
-        ]
-        extra = "\n\n".join(b for b in blocks if b)
-        content = (
-            f"[데이터]\n{self._build_context()}\n\n"
-            f"{self._build_qualitative_context(question)}\n\n"
-            + (f"{extra}\n\n" if extra else "")
-            + f"[질문]\n{question}"
-        )
-        # history는 같은 대화창 내 이전 질문/답변 turn만 담고 있다(호출자인
-        # chat.py가 새 대화창마다 빈 리스트로 초기화). 여기 그대로 이어붙이면
-        # 국가 등 앞선 turn에서 지정한 맥락을 모델이 계속 참고할 수 있다.
-        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-        messages.extend(history or [])
-        messages.append({"role": "user", "content": content})
+    def _call_model(self, messages: list[dict]) -> dict:
         response = self._client.chat.completions.create(
             model=LLM_MODEL,
             seed=42,
@@ -387,9 +425,58 @@ class ChatService:
             if not isinstance(follow_ups, list):
                 follow_ups = []
             follow_ups = [str(q) for q in follow_ups if isinstance(q, str) and q.strip()][:3]
+            citations = parsed.get("citations") or []
+            if not isinstance(citations, list):
+                citations = []
         except (json.JSONDecodeError, AttributeError):
             # 모델이 규칙 18번(JSON 형식)을 어기고 순수 텍스트로 답하면, 그 텍스트를
-            # 그대로 답변으로 쓰고 후속 질문은 비워둔다 - 답변 자체를 실패시키지 않는다.
+            # 그대로 답변으로 쓰고 후속 질문/citations는 비워둔다 - 답변 자체를
+            # 실패시키지 않는다.
             answer = raw
             follow_ups = []
-        return {"answer": answer, "follow_up_questions": follow_ups}
+            citations = []
+        return {"answer": answer, "follow_up_questions": follow_ups, "citations": citations}
+
+    def ask(self, question: str, history: list[dict] | None = None) -> dict:
+        # analysis_long은 다른 표들의 원천 롱포맷이라 내용이 중복이고, 국가당 최대
+        # 수백 행이라 상시 주입하면 컨텍스트 한도를 넘긴다(dashboard_data_dictionary.md
+        # 12절 설계 의도대로 "출처 확인용"으로만 남겨두고 기본 주입에서는 제외한다).
+        survey_rows = self._fetch_2025_survey_rows(question)
+        blocks = [
+            self._build_content_reasons_context(question),
+            self._build_bottleneck_observations_context(question),
+            self._build_2025_survey_context(survey_rows),
+        ]
+        extra = "\n\n".join(b for b in blocks if b)
+        content = (
+            f"[데이터]\n{self._build_context()}\n\n"
+            f"{self._build_qualitative_context(question)}\n\n"
+            + (f"{extra}\n\n" if extra else "")
+            + f"[질문]\n{question}"
+        )
+        # history는 같은 대화창 내 이전 질문/답변 turn만 담고 있다(호출자인
+        # chat.py가 새 대화창마다 빈 리스트로 초기화). 여기 그대로 이어붙이면
+        # 국가 등 앞선 turn에서 지정한 맥락을 모델이 계속 참고할 수 있다.
+        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+        messages.extend(history or [])
+        messages.append({"role": "user", "content": content})
+
+        result = self._call_model(messages)
+        problems = _verify_survey_citations(result["citations"], survey_rows)
+        if problems:
+            # backend/experiments/verify_grounding_poc.py에서 확인한 대로, citations가
+            # 실제 데이터와 안 맞으면(2025 조사 블록 관련 완전 창작형/합성형 환각일
+            # 가능성이 큼) 한 번 재시도한다 - 같은 seed라도 이전 응답이 대화에 없으므로
+            # 다른 결과가 나올 여지가 있다. 재시도도 실패하면 막지 않고 경고만 붙인다
+            # (오탐으로 정상 답변까지 막아버리는 것을 더 큰 위험으로 판단).
+            retry_result = self._call_model(messages)
+            retry_problems = _verify_survey_citations(retry_result["citations"], survey_rows)
+            if not retry_problems:
+                result = retry_result
+            else:
+                result["answer"] += (
+                    "\n\n⚠️ 위 답변 중 일부 수치는 2025년 조사 원본과 자동 대조에서 "
+                    "확인되지 않았습니다. 참고용으로만 활용하세요."
+                )
+
+        return {"answer": result["answer"], "follow_up_questions": result["follow_up_questions"]}
